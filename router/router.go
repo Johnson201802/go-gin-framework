@@ -37,6 +37,7 @@ func InitRouter() *gin.Engine {
 	router.GET("/getMsmConfig", apis.GetMsmConfig)
 	router.GET("/getMchConfig", apis.GetMchConfig)
 	router.POST("/imgUploads", apis.ImgUploads)
+	router.GET("/sendMSM", apis.SendMSM)
 
 	return router
 }

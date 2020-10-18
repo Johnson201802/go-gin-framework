@@ -2,6 +2,7 @@ package apis
 
 import (
 	"awesomeProject/databases"
+	"awesomeProject/extend"
 	"awesomeProject/models"
 	"awesomeProject/tools"
 	"fmt"
@@ -81,5 +82,9 @@ func GetMchConfig(c *gin.Context) {
 }
 
 func ImgUploads(c *gin.Context){
-	
+
+}
+
+func SendMSM(c *gin.Context){
+	sms.SingleSms()
 }
