@@ -69,3 +69,41 @@ func GetBaseconfig(c *gin.Context) {
 		"data": Baseconfig,
 	})
 }
+
+func GetMsmConfig(c *gin.Context) {
+	MsmConfig := make(map[string]interface{}, 0)
+	var config BaseConfig
+	db := databases.Connect()
+	db.Table("config").Where("config_id = ?", 1).First(&config).Scan(&config)
+	MsmConfig["sms_app_id"] = config.Config_value
+
+	db.Table("config").Where("config_id = ?", 2).First(&config).Scan(&config)
+	MsmConfig["sms_app_key"] = config.Config_value
+
+	db.Table("config").Where("config_id = ?", 3).First(&config).Scan(&config)
+	MsmConfig["sms_sign"] = config.Config_value
+
+	c.JSON(200, gin.H{
+		"code": 200,
+		"data": MsmConfig,
+	})
+}
+
+func GetMchConfig(c *gin.Context) {
+	MchConfig := make(map[string]interface{}, 0)
+	var config BaseConfig
+	db := databases.Connect()
+	db.Table("config").Where("config_id = ?", 10).First(&config).Scan(&config)
+	MchConfig["mch_appid"] = config.Config_value
+
+	db.Table("config").Where("config_id = ?", 11).First(&config).Scan(&config)
+	MchConfig["mch_key"] = config.Config_value
+
+	db.Table("config").Where("config_id = ?", 12).First(&config).Scan(&config)
+	MchConfig["url"] = config.Config_value
+
+	c.JSON(200, gin.H{
+		"code": 200,
+		"data": MchConfig,
+	})
+}

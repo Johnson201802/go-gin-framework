@@ -71,3 +71,15 @@ func GetServerInfo(c *gin.Context) {
 func GetBaseconfig(c *gin.Context) {
 	models.GetBaseconfig(c)
 }
+
+func GetMsmConfig(c *gin.Context) {
+	models.GetMsmConfig(c)
+}
+
+func GetMchConfig(c *gin.Context) {
+	models.GetMchConfig(c)
+}
+
+func ImgUploads(c *gin.Context){
+	
+}
