@@ -9,15 +9,15 @@ import (
 func SingleSms(){
 	// 创建Sender
 	sender := &gosms.QSender{
-		AppID:  "1400360532",                       // appid
-		AppKey: "f215ace273cdf6da032a1d05921780ef", // appkey
+		AppID:  "",                       // appid
+		AppKey: "", // appkey
 	}
 
 	// 发送短信
 	res, err := sender.SingleSend(
 		"约工宝",     // 短信签名，此处应填写审核通过的签名内容，非签名 ID，如果使用默认签名，该字段填 ""
 		86,            // 国家号
-		"17621953521", // 手机号
+		"", // 手机号
 		598800,         // 短信正文ID
 		"123456987678567",      // 参数1
 		//"5",           // 参数2，后面可添加多个参数
