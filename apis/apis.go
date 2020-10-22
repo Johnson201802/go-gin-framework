@@ -2,12 +2,12 @@ package apis
 
 import (
 	"awesomeProject/databases"
-	"awesomeProject/extend"
+	"awesomeProject/extend/oss"
+	"awesomeProject/extend/sms"
 	"awesomeProject/models"
 	"awesomeProject/tools"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	_ "github.com/aliyun/aliyun-oss-go-sdk/oss"
 )
 
 var roles = [2]string{"admin", "edit"}
@@ -111,4 +111,12 @@ func ImgUploads(c *gin.Context){
 
 func SendMSM(c *gin.Context){
 	sms.SingleSms()
+}
+
+func GetOss(c *gin.Context){
+	oss.ListFile(c)
+}
+
+func UploadFile (c *gin.Context){
+	oss.UploadFile(c)
 }
