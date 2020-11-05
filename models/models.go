@@ -4,6 +4,7 @@ import (
 	"awesomeProject/databases"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"io/ioutil"
 )
 
 type Admin struct {
@@ -106,4 +107,12 @@ func GetMchConfig(c *gin.Context) {
 		"code": 200,
 		"data": MchConfig,
 	})
+}
+
+func SaveConfigBase(c *gin.Context) {
+	//pp := c.Request.ParseForm()
+
+	data, _ := ioutil.ReadAll(c.Request.Body)
+	fmt.Println(string(data))
+
 }

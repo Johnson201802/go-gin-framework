@@ -8,6 +8,7 @@ import (
 	"awesomeProject/tools"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"os"
 )
 
 var roles = [2]string{"admin", "edit"}
@@ -82,41 +83,48 @@ func GetMchConfig(c *gin.Context) {
 	models.GetMchConfig(c)
 }
 
-
-func ImgUploads(c *gin.Context){
-	f , err := c.FormFile("file")
+func ImgUploads(c *gin.Context) {
+	f, err := c.FormFile("file")
 	if err != nil {
-		c.JSON(200,gin.H{
-			"error" : err,
+		c.JSON(200, gin.H{
+			"error": err,
 		})
 		return
-	}else{
-		err := c.SaveUploadedFile(f,f.Filename)
+	} else {
+		err := c.SaveUploadedFile(f, f.Filename)
 		if err != nil {
-			c.JSON(200,gin.H{
-				"error" : err,
+			c.JSON(200, gin.H{
+				"error": err,
 			})
 			return
-		}else{
-			c.JSON(200,gin.H{
-				"error" : "ok",
-				"code" : 200,
-				"photo" : "http://127.0.0.1:8090/"+f.Filename,
-			})
-			return
+		} else {
+			fmt.Println(f.Filename)
+			UploadFile(c, f.Filename)
+			err := os.Remove(f.Filename)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 		}
 	}
-
 }
 
-func SendMSM(c *gin.Context){
+func SendMSM(c *gin.Context) {
 	sms.SingleSms()
 }
 
-func GetOss(c *gin.Context){
+func GetOss(c *gin.Context) {
 	oss.ListFile(c)
 }
 
-func UploadFile (c *gin.Context){
-	oss.UploadFile(c)
+func UploadFile(c *gin.Context, filename string) {
+	oss.UploadFile(c, filename)
+}
+
+func GetStorageList(c *gin.Context) {
+	oss.GetStorageList(c)
+}
+
+func SaveConfigBase(c *gin.Context) {
+	models.SaveConfigBase(c)
 }

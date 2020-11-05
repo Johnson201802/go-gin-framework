@@ -13,7 +13,7 @@ func HandleError(err error) {
 }
 
 //创建OSS实例
-func CreateOss(){
+func CreateOss() {
 	// Endpoint以杭州为例，其它Region请按实际情况填写。
 	endpoint := "http://oss-cn-hangzhou.aliyuncs.com"
 	// 阿里云主账号AccessKey拥有所有API的访问权限，风险很高。强烈建议您创建并使用RAM账号进行API访问或日常运维，请登录 https://ram.console.aliyun.com 创建RAM账号。
@@ -33,7 +33,7 @@ func CreateOss(){
 }
 
 //列举文件
-func ListFile (c *gin.Context) {
+func ListFile(c *gin.Context) {
 	// 创建OSSClient实例。
 	client, err := oss.New("https://oss-accelerate.aliyuncs.com", "LTAI4FuzqYkEXt8c4EYZ7TRJ", "ZaXpqhJf13PFRG8AePWnB0OpB7LG2k")
 	if err != nil {
@@ -54,7 +54,7 @@ func ListFile (c *gin.Context) {
 			HandleError(err)
 		}
 		// 打印列举文件，默认情况下一次返回100条记录。
-		for key , object := range lsRes.Objects {
+		for key, object := range lsRes.Objects {
 			files[key] = object.Key
 		}
 
@@ -64,16 +64,62 @@ func ListFile (c *gin.Context) {
 			break
 		}
 	}
-	c.JSON(200,gin.H{
-		"code" : 200,
-		"data" : files,
+	c.JSON(200, gin.H{
+		"code": 200,
+		"data": files,
 	})
 }
 
 //上传文件
-func UploadFile(c *gin.Context){
+func UploadFile(c *gin.Context, localfile string) {
+	client, err := oss.New("oss-cn-shanghai.aliyuncs.com", "LTAI4FuzqYkEXt8c4EYZ7TRJ", "ZaXpqhJf13PFRG8AePWnB0OpB7LG2k")
+	if err != nil {
+		// HandleError(err)
+		fmt.Println(err)
+	}
+
+	bucket, err := client.Bucket("img-c-jason")
+	if err != nil {
+		// HandleError(err)
+		fmt.Println(err)
+	}
+
+	err = bucket.PutObjectFromFile(localfile, localfile)
+	if err != nil {
+		// HandleError(err)
+		fmt.Println(err)
+	} else {
+		c.JSON(200, gin.H{
+			"code":   200,
+			"qrcode": "https://img-c-jason.oss-accelerate.aliyuncs.com/" + localfile,
+		})
+	}
 
 }
 
+//获取存储空间列表
+func GetStorageList(c *gin.Context) {
+	client, err := oss.New("oss-cn-shenzhen.aliyuncs.com", "LTAI4FuzqYkEXt8c4EYZ7TRJ", "ZaXpqhJf13PFRG8AePWnB0OpB7LG2k")
+	if err != nil {
+		// HandleError(err)
+		fmt.Println(err)
+	}
 
+	lsRes, err := client.ListBuckets()
+	if err != nil {
+		// HandleError(err)
+		fmt.Println(err)
+	}
 
+	data := make(map[int]interface{}, 0)
+	for key, bucket := range lsRes.Buckets {
+		data[key] = bucket.Name
+	}
+
+	c.JSON(200, gin.H{
+		"code": 200,
+		"data": data,
+	})
+}
+
+//

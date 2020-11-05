@@ -8,7 +8,7 @@ import (
 )
 
 func Connect() *gorm.DB {
-	db, err := gorm.Open("mysql", "root:root@(127.0.0.1)/gin?charset=utf8mb4&parseTime=True&loc=Local")
+	db, err := gorm.Open("mysql", "root:root@tcp(127.0.0.1)/gin?charset=utf8mb4&parseTime=True&loc=Local")
 
 	if err != nil {
 		fmt.Println("MYSQL连接失败了！")
