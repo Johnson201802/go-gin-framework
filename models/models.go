@@ -4,7 +4,7 @@ import (
 	"awesomeProject/databases"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"io/ioutil"
+	"strconv"
 )
 
 type Admin struct {
@@ -109,10 +109,116 @@ func GetMchConfig(c *gin.Context) {
 	})
 }
 
+type ConfigBase struct {
+	Miniapp_id string
+	Qrcode string
+	Telphone string
+	Miniapp_secrets string
+	Tell_content string
+}
+
 func SaveConfigBase(c *gin.Context) {
-	//pp := c.Request.ParseForm()
+	configBase := &ConfigBase{}
+	if c.BindJSON(&configBase) == nil{
+		db := databases.Connect()
+		db.Table("config").Where("config_id = ?", 7).Update("config_value",configBase.Miniapp_id)
+		db.Table("config").Where("config_id = ?", 9).Update("config_value",configBase.Miniapp_secrets)
+		db.Table("config").Where("config_id = ?", 5).Update("config_value",configBase.Qrcode)
+		db.Table("config").Where("config_id = ?", 13).Update("config_value",configBase.Tell_content)
+		db.Table("config").Where("config_id = ?", 8).Update("config_value",configBase.Telphone)
+		c.JSON(200,gin.H{"code":200,"msg":"OK！"})
+	}else{
+		c.JSON(200,gin.H{"msg":"非法请求！"})
+	}
 
-	data, _ := ioutil.ReadAll(c.Request.Body)
-	fmt.Println(string(data))
+}
 
+type ConfigSms struct {
+	Sms_app_id string
+	Sms_app_key string
+	Sms_sign string
+}
+
+func SaveConfigSms(c *gin.Context){
+	configSms := &ConfigSms{}
+	if c.BindJSON(&configSms) == nil{
+		db := databases.Connect()
+		db.Table("config").Where("config_id = ?", 1).Update("config_value",configSms.Sms_app_id)
+		db.Table("config").Where("config_id = ?", 2).Update("config_value",configSms.Sms_app_key)
+		db.Table("config").Where("config_id = ?", 3).Update("config_value",configSms.Sms_sign)
+		c.JSON(200,gin.H{"code":200,"msg":"OK！"})
+	}else{
+		c.JSON(200,gin.H{"msg":"非法请求！"})
+	}
+}
+
+type ConfigMch struct {
+	Mch_appid string
+	Mch_key string
+	Url string
+}
+
+func SaveConfigMch(c *gin.Context){
+	configMch := &ConfigMch{}
+	if c.BindJSON(&configMch) == nil{
+		db := databases.Connect()
+		db.Table("config").Where("config_id = ?", 10).Update("config_value",configMch.Mch_appid)
+		db.Table("config").Where("config_id = ?", 11).Update("config_value",configMch.Mch_key)
+		db.Table("config").Where("config_id = ?", 12).Update("config_value",configMch.Url)
+		c.JSON(200,gin.H{"code":200,"msg":"OK！"})
+	}else{
+		c.JSON(200,gin.H{"msg":"非法请求！"})
+	}
+}
+
+type AuthRule struct {
+	Id int
+	Name string
+	Title string
+	Status_t string
+	Pid int
+	Type int
+}
+
+func GetAuthList(c *gin.Context){
+	var authrules[] AuthRule
+	var count int
+	page, _ := strconv.Atoi(c.Request.FormValue("page"))
+	limit, _ := strconv.Atoi(c.Request.FormValue("limit"))
+	start := (page-1)*limit
+	sort := c.Request.FormValue("sort")
+
+	if(sort=="+id"){
+		sort = "Id DESC"
+	}else{
+		sort = "Id ASC"
+	}
+
+	db := databases.Connect()
+	db.Table("auth_rule").Limit(limit).Offset(start).Order("Id desc").Find(&authrules).Scan(&authrules)
+	db.Table("auth_rule").Count(&count)
+	c.JSON(200,gin.H{"data":authrules,"total":count})
+
+}
+
+func DelRule(c *gin.Context){
+	authrule := AuthRule{}
+	id,_ := strconv.Atoi(c.Request.FormValue("id"))
+	authrule.Id = id
+	db := databases.Connect()
+	db.Table("auth_rule").Where("id = ?", id).Delete(&authrule)
+	c.JSON(200,gin.H{"code":200,"msg":"ok"})
+}
+
+func CreateRule(c *gin.Context){
+	rule := &AuthRule{}
+	rule.Pid = 0
+	rule.Type = 1
+	rule.Name = c.Request.FormValue("name")
+	rule.Title = c.Request.FormValue("title")
+	rule.Status_t = c.Request.FormValue("status_t")
+
+	db := databases.Connect()
+	db.Table("auth_rule").Create(&rule)
+	c.JSON(200,gin.H{"code":200,"msg":"OK！"})
 }

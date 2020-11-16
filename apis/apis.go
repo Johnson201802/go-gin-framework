@@ -98,12 +98,12 @@ func ImgUploads(c *gin.Context) {
 			})
 			return
 		} else {
-			fmt.Println(f.Filename)
 			UploadFile(c, f.Filename)
 			err := os.Remove(f.Filename)
+			db := databases.Connect()
+			db.Table("config").Where("config_id = ?", 5).Update("config_value","https://img-c-jason.oss-accelerate.aliyuncs.com/"+f.Filename)
 			if err != nil {
 				fmt.Println(err)
-				return
 			}
 		}
 	}
@@ -127,4 +127,24 @@ func GetStorageList(c *gin.Context) {
 
 func SaveConfigBase(c *gin.Context) {
 	models.SaveConfigBase(c)
+}
+
+func SaveConfigSms(c *gin.Context){
+	models.SaveConfigSms(c)
+}
+
+func SaveConfigMch(c *gin.Context){
+	models.SaveConfigSms(c)
+}
+
+func GetAuthList(c *gin.Context){
+	models.GetAuthList(c)
+}
+
+func DelRule(c *gin.Context){
+	models.DelRule(c)
+}
+
+func CreateRule(c *gin.Context){
+	models.CreateRule(c)
 }

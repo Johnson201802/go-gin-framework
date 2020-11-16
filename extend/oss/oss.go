@@ -71,7 +71,7 @@ func ListFile(c *gin.Context) {
 }
 
 //上传文件
-func UploadFile(c *gin.Context, localfile string) {
+func UploadFile(c *gin.Context, localfile string) (img string){
 	client, err := oss.New("oss-cn-shanghai.aliyuncs.com", "LTAI4FuzqYkEXt8c4EYZ7TRJ", "ZaXpqhJf13PFRG8AePWnB0OpB7LG2k")
 	if err != nil {
 		// HandleError(err)
@@ -88,13 +88,14 @@ func UploadFile(c *gin.Context, localfile string) {
 	if err != nil {
 		// HandleError(err)
 		fmt.Println(err)
+		return ""
 	} else {
 		c.JSON(200, gin.H{
 			"code":   200,
 			"qrcode": "https://img-c-jason.oss-accelerate.aliyuncs.com/" + localfile,
 		})
+		return "https://img-c-jason.oss-accelerate.aliyuncs.com/" + localfile
 	}
-
 }
 
 //获取存储空间列表

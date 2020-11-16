@@ -15,7 +15,7 @@ func cors() gin.HandlerFunc {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With,x-token")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "OPTIONS, GET, POST")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "OPTIONS, GET, POST, DELETE")
 		c.Writer.Header().Set("Content-Type", "application/json; charset=utf-8")
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(200)
@@ -31,6 +31,7 @@ func InitRouter() *gin.Engine {
 	router.POST("/adminLogin", apis.IndexApi)
 
 	//路由组没写加上JWT鉴权
+	//系统设置
 	router.GET("/getInfo", apis.GetInfo)
 	router.GET("/serverInfo", apis.GetServerInfo)
 	router.GET("/getBaseconfig", apis.GetBaseconfig)
@@ -38,6 +39,13 @@ func InitRouter() *gin.Engine {
 	router.GET("/getMchConfig", apis.GetMchConfig)
 	router.POST("/imgUploads", apis.ImgUploads)
 	router.POST("/saveConfigBase", apis.SaveConfigBase)
+	router.POST("/saveConfigSms", apis.SaveConfigSms)
+	router.POST("/saveConfigMch", apis.SaveConfigMch)
+
+	//权限管理
+	router.GET("/getAuthList", apis.GetAuthList)
+	router.DELETE("/delRule", apis.DelRule)
+	router.POST("/createRule", apis.CreateRule)
 
 	return router
 }
