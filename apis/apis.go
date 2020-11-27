@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"os"
+	"strconv"
 )
 
 var roles = [2]string{"admin", "edit"}
@@ -16,10 +17,12 @@ var roles = [2]string{"admin", "edit"}
 func IndexApi(c *gin.Context) {
 	name := c.Request.FormValue("username")
 	pwd := tools.MD5(c.Request.FormValue("password"))
+	var uid2 string
 	flag, uid := models.GetAdmin(name, pwd)
+	uid2 = strconv.Itoa(uid)
 
 	//生成TOKEN
-	token, _ := tools.CreateToken(uid, "johnson2018092789728376273672364wey")
+	token, _ := tools.CreateToken(uid2, "johnson2018092789728376273672364wey")
 	red := databases.Connect_redis()
 	defer red.Close()
 	var err error
@@ -147,4 +150,128 @@ func DelRule(c *gin.Context){
 
 func CreateRule(c *gin.Context){
 	models.CreateRule(c)
+}
+
+func UpdateRule(c *gin.Context){
+	models.UpdateRule(c)
+}
+
+func GetAdminList(c *gin.Context){
+	models.GetAdminList(c)
+}
+
+func GetGroupList(c *gin.Context){
+	models.GetGroupList(c)
+}
+
+func CreateAdmin(c *gin.Context){
+	models.CreateAdmin(c)
+}
+
+func DelAdmin(c *gin.Context){
+	models.DelAdmin(c)
+}
+
+func UpdateAdmin(c *gin.Context){
+	models.UpdateAdmin(c)
+}
+
+func GetRoleList(c *gin.Context){
+	models.GetRoleList(c)
+}
+
+func GetRuleList(c *gin.Context){
+	models.GetRuleList(c)
+}
+
+func AddRole(c *gin.Context){
+	models.AddRole(c)
+}
+
+func DelRole(c *gin.Context){
+	models.DelRole(c)
+}
+
+func GetOneRole(c *gin.Context){
+	models.GetOneRole(c)
+}
+
+func UpdateRole(c *gin.Context){
+	models.UpdateRole(c)
+}
+
+func FetchUserList(c *gin.Context){
+	models.FetchUserList(c)
+}
+
+func DelUser(c *gin.Context){
+	models.DelUser(c)
+}
+
+func FetchArticleList(c *gin.Context){
+	models.FetchArticleList(c)
+}
+
+func DelArticle(c *gin.Context){
+	models.DelArticle(c)
+}
+
+func CreateArticle(c *gin.Context){
+	models.CreateArticle(c)
+}
+
+func FetchOneArticle(c *gin.Context){
+	models.FetchOneArticle(c)
+}
+
+func UpdateArticle(c *gin.Context){
+	models.UpdateArticle(c)
+}
+
+func FetchMerchantList(c *gin.Context){
+	models.FetchMerchantList(c)
+}
+
+func DelMerchant(c *gin.Context){
+	models.DelMerchant(c)
+}
+
+func CreateMerchant(c *gin.Context){
+	models.CreateMerchant(c)
+}
+
+func FetchOneMerchant(c *gin.Context){
+	models.FetchOneMerchant(c)
+}
+
+func UpdateMerchant(c *gin.Context){
+	models.UpdateMerchant(c)
+}
+
+func FetchOrderList(c *gin.Context){
+	models.FetchOrderList(c)
+}
+
+func DelOrder(c *gin.Context){
+	models.DelOrder(c)
+}
+
+func FetchServicesList(c *gin.Context){
+	models.FetchServicesList(c)
+}
+
+func ChangeStatus(c *gin.Context){
+	models.ChangeStatus(c)
+}
+
+func CreateService(c *gin.Context){
+	models.CreateService(c)
+}
+
+func GetMerchant(c *gin.Context){
+	models.GetMerchant(c)
+}
+
+func UpdateService(c *gin.Context){
+	models.UpdateService(c)
 }

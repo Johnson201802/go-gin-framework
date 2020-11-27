@@ -98,6 +98,30 @@ func UploadFile(c *gin.Context, localfile string) (img string){
 	}
 }
 
+//上传文件
+func UploadFile2(c *gin.Context, localfile string) (img string){
+	client, err := oss.New("oss-cn-shanghai.aliyuncs.com", "LTAI4FuzqYkEXt8c4EYZ7TRJ", "ZaXpqhJf13PFRG8AePWnB0OpB7LG2k")
+	if err != nil {
+		// HandleError(err)
+		fmt.Println(err)
+	}
+
+	bucket, err := client.Bucket("img-c-jason")
+	if err != nil {
+		// HandleError(err)
+		fmt.Println(err)
+	}
+
+	err = bucket.PutObjectFromFile(localfile, localfile)
+	if err != nil {
+		// HandleError(err)
+		fmt.Println(err)
+		return ""
+	} else {
+		return "https://img-c-jason.oss-accelerate.aliyuncs.com/" + localfile
+	}
+}
+
 //获取存储空间列表
 func GetStorageList(c *gin.Context) {
 	client, err := oss.New("oss-cn-shenzhen.aliyuncs.com", "LTAI4FuzqYkEXt8c4EYZ7TRJ", "ZaXpqhJf13PFRG8AePWnB0OpB7LG2k")

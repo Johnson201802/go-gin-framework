@@ -2,9 +2,11 @@ package router
 
 import (
 	"awesomeProject/apis"
+	v1 "awesomeProject/apis/v1"
 	"github.com/gin-gonic/gin"
 )
 
+//管理端
 //跨域中间件配置
 func cors() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -46,6 +48,61 @@ func InitRouter() *gin.Engine {
 	router.GET("/getAuthList", apis.GetAuthList)
 	router.DELETE("/delRule", apis.DelRule)
 	router.POST("/createRule", apis.CreateRule)
+	router.POST("/updateRule", apis.UpdateRule)
+
+	//管理员管理
+	router.GET("/getAdminList",apis.GetAdminList)
+	router.GET("/getGroupList",apis.GetGroupList)
+	router.POST("/createAdmin",apis.CreateAdmin)
+	router.DELETE("/delAdmin",apis.DelAdmin)
+	router.POST("/updateAdmin",apis.UpdateAdmin)
+
+	//用户组管理
+	router.GET("/getRoleList",apis.GetRoleList)
+	router.GET("/getRuleList",apis.GetRuleList)
+	router.POST("/addRole",apis.AddRole)
+	router.DELETE("/delRole",apis.DelRole)
+	router.GET("/getOneRole",apis.GetOneRole)
+	router.POST("/updateRole",apis.UpdateRole)
+
+	//用户管理
+	router.GET("/fetchUserList",apis.FetchUserList)
+	router.DELETE("/delUser",apis.DelUser)
+
+	//文章管理
+	router.GET("/fetchArticleList",apis.FetchArticleList)
+	router.DELETE("/delArticle",apis.DelArticle)
+	router.POST("/createArticle",apis.CreateArticle)
+	router.POST("/updateArticle",apis.UpdateArticle)
+	router.GET("/fetchOneArticle",apis.FetchOneArticle)
+
+	//商家管理
+	router.GET("/fetchMerchantList",apis.FetchMerchantList)
+	router.POST("/delMerchant",apis.DelMerchant)
+	router.POST("/createMerchant",apis.CreateMerchant)
+	router.GET("/fetchOneMerchant",apis.FetchOneMerchant)
+	router.POST("/updateMerchant",apis.UpdateMerchant)
+
+	//订单管理
+	router.GET("/fetchOrderList",apis.FetchOrderList)
+	router.POST("/delOrder",apis.DelOrder)
+
+	//服务管理
+	router.GET("/fetchServicesList",apis.FetchServicesList)
+	router.POST("/changeStatus",apis.ChangeStatus)
+	router.POST("/createService",apis.CreateService)
+	router.GET("/getMerchant",apis.GetMerchant)
+	router.POST("/updateService",apis.UpdateService)
+
+	//小程序端
+	router.GET("/api/v1/getMerchant",v1.GetMerchant2)
+	router.GET("/api/v1/getOpenid",v1.GetOpenid)
+	router.GET("/api/v1/getPhoneNumber",v1.GetPhoneNumber)
+	router.GET("/api/v1/getAd",v1.GetAd)
+	router.GET("/api/v1/getDetail",v1.GetDetail)
+	router.GET("/api/v1/getMerchantList",v1.GetMerchantList)
+	router.GET("/api/v1/getServiceList",v1.GetServiceList)
+	router.GET("/api/v1/getPayPreview",v1.GetPayPreview)
 
 	return router
 }
