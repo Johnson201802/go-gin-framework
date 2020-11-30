@@ -94,6 +94,12 @@ func InitRouter() *gin.Engine {
 	router.GET("/getMerchant",apis.GetMerchant)
 	router.POST("/updateService",apis.UpdateService)
 
+	//是否有新信息
+	router.GET("/getNewMsg",apis.GetNewMsg)
+	router.GET("/getQuestionList",apis.GetQuestionList)
+	router.POST("/setRead",apis.SetRead)
+	router.POST("/articleCreate",apis.ArticleCreate)
+
 	//小程序端
 	router.GET("/api/v1/getMerchant",v1.GetMerchant2)
 	router.GET("/api/v1/getOpenid",v1.GetOpenid)
@@ -103,6 +109,7 @@ func InitRouter() *gin.Engine {
 	router.GET("/api/v1/getMerchantList",v1.GetMerchantList)
 	router.GET("/api/v1/getServiceList",v1.GetServiceList)
 	router.GET("/api/v1/getPayPreview",v1.GetPayPreview)
+	router.GET("/api/v1/getOrderList",v1.GetOrderList)
 
 	return router
 }

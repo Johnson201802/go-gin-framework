@@ -857,3 +857,85 @@ func UpdateService(c *gin.Context){
 		c.JSON(200,gin.H{"code":400})
 	}
 }
+
+//消息结构体
+type  Question struct{
+	Question_id int
+	User_id2 int
+	Content string
+	Time int
+	Is_read string
+	Nick_name string
+	Avatar string
+	Phone int
+}
+
+func GetNewMsg(c *gin.Context){
+	var count int
+
+	db := databases.Connect()
+	db.Table("question").Where("is_read = ?", 0).Count(&count)
+
+	if count == 0{
+		c.JSON(200,gin.H{"code":300})
+	}else{
+		c.JSON(200,gin.H{"code":200})
+	}
+
+}
+
+func GetQuestionList(c *gin.Context){
+	var question[] Question
+	var count int
+
+	page, _ := strconv.Atoi(c.Request.FormValue("page"))
+	limit, _ := strconv.Atoi(c.Request.FormValue("limit"))
+	start := (page-1)*limit
+
+	db := databases.Connect()
+	err := db.Debug().Table("question").Select("question.question_id, question.user_id2, question.content, question.time, question.is_read, user.nick_name, user.avatar, user.phone, user.user_id").Joins("join user on user.user_id = question.user_id2").Order("question_id desc").Limit(limit).Offset(start).Find(&question).Scan(&question).Error
+	db.Table("question").Count(&count)
+
+	if err == nil{
+		c.JSON(200,gin.H{"code":200,"data":question,"count":count})
+	}else{
+		c.JSON(200,gin.H{"code":300,"msg":"error"})
+	}
+}
+
+func SetRead(c *gin.Context){
+	var question Question
+
+	id, _ := strconv.Atoi(c.Request.FormValue("id"))
+
+	question.Question_id = id
+	question.Is_read = "1"
+	db := databases.Connect()
+	err := db.Debug().Table("question").Where("question_id = ?",id).Update(&question).Error
+
+	if err != nil{
+		c.JSON(200,gin.H{"code":300,"msg":"error"})
+	}else{
+		c.JSON(200,gin.H{"code":200,"msg":"success"})
+	}
+}
+
+//消息结构体
+type  Question2 struct{
+	Question_id int
+	User_id2 int
+	Content string
+}
+
+func ArticleCreate(c *gin.Context){
+	var question Question2
+
+	if c.BindJSON(&question)==nil{
+		db := databases.Connect()
+		db.Table("question").Create(&question)
+
+		c.JSON(200,gin.H{"code":200})
+	}else{
+		c.JSON(200,gin.H{"code":400})
+	}
+}

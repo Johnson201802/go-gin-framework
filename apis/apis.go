@@ -275,3 +275,19 @@ func GetMerchant(c *gin.Context){
 func UpdateService(c *gin.Context){
 	models.UpdateService(c)
 }
+
+func GetNewMsg(c *gin.Context){
+	models.GetNewMsg(c)
+}
+
+func GetQuestionList(c *gin.Context){
+	models.GetQuestionList(c)
+}
+
+func SetRead(c *gin.Context){
+	models.SetRead(c)
+}
+
+func ArticleCreate(c *gin.Context){
+	models.ArticleCreate(c)
+}

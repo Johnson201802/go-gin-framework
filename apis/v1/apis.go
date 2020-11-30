@@ -42,7 +42,7 @@ func GetOpenid(c *gin.Context){
 	avatar := c.Request.FormValue("avatar")
 
 	//fmt.Println(code+","+nick_name+","+avatar)
-	res , _ := wechat.WXLogin(code,"wxb1e70d542d0624fb","11825d18b04172b959ec504d06ffdf7d")
+	res , _ := wechat.WXLogin(code,"wxb7475adc9f5980d2","2fcbbe27e765628bf3c61f8ff384ccac")
 	db := databases.Connect()
 	err := db.Table("user").Where("open_id = ?",res.OpenId).First(&user).Scan(&user).Error
 	if err != nil {
@@ -52,7 +52,7 @@ func GetOpenid(c *gin.Context){
 		db.Table("user").Create(&user)
 		c.JSON(200,gin.H{"code":200})
 	}else{
-		c.JSON(200,gin.H{"code":200,"user":user,"session_id":res.SessionKey})
+		c.JSON(200,gin.H{"code":200,"user":user,"session_id":res.SessionKey,"openid":res.OpenId})
 	}
 
 }
@@ -222,5 +222,34 @@ func GetServiceList(c *gin.Context){
 }
 
 func GetPayPreview(c *gin.Context){
-	wechatpay.NewClient()
+	wechatpay.GetInit(c)
+}
+
+//订单结构体
+type Order2 struct{
+	Order_id int
+	Merchant_id int
+	Service_id string
+	User_id int
+	Price float32
+	Discount int
+	Status int
+	Services [] Service2
+}
+
+type Service2 struct{
+	Service_id int
+	Service_name string
+	Now_price float32
+}
+
+func GetOrderList(c *gin.Context){
+	var order Order2
+
+	id, _ := strconv.Atoi(c.Request.FormValue("user_id"))
+
+	db := databases.Connect()
+	db.Table("order").Where("user_id=?",id).Find(&order).Scan(&order)
+
+	c.JSON(200,gin.H{"code":200,"data":order})
 }
