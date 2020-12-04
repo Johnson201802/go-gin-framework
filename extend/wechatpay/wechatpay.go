@@ -167,7 +167,7 @@ func GetInit2(c *gin.Context){
 	bm.Set("nonce_str", gotil.GetRandomString(32))
 	bm.Set("body", "小程序服务支付")
 	bm.Set("out_trade_no", order.Id)
-	bm.Set("total_fee", 1) //order.Price*100
+	bm.Set("total_fee", order.Price*100) //order.Price*100
 	bm.Set("spbill_create_ip", "127.0.0.1")
 	bm.Set("notify_url", "https://api.piduopi.com/api/v1/notify2")
 	bm.Set("trade_type", wechat.TradeType_Mini)
