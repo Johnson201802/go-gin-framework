@@ -17,8 +17,8 @@ func CreateOss() {
 	// Endpoint以杭州为例，其它Region请按实际情况填写。
 	endpoint := "http://oss-cn-hangzhou.aliyuncs.com"
 	// 阿里云主账号AccessKey拥有所有API的访问权限，风险很高。强烈建议您创建并使用RAM账号进行API访问或日常运维，请登录 https://ram.console.aliyun.com 创建RAM账号。
-	accessKeyId := "<LTAI4FuzqYkEXt8c4EYZ7TRJ>"
-	accessKeySecret := "<ZaXpqhJf13PFRG8AePWnB0OpB7LG2k>"
+	accessKeyId := "<1>"
+	accessKeySecret := "<1>"
 	bucketName := "<johnson001>"
 	// 创建OSSClient实例。
 	client, err := oss.New(endpoint, accessKeyId, accessKeySecret)
@@ -35,7 +35,7 @@ func CreateOss() {
 //列举文件
 func ListFile(c *gin.Context) {
 	// 创建OSSClient实例。
-	client, err := oss.New("https://oss-accelerate.aliyuncs.com", "LTAI4FuzqYkEXt8c4EYZ7TRJ", "ZaXpqhJf13PFRG8AePWnB0OpB7LG2k")
+	client, err := oss.New("https://oss-accelerate.aliyuncs.com", "1", "1")
 	if err != nil {
 		HandleError(err)
 	}
@@ -72,7 +72,7 @@ func ListFile(c *gin.Context) {
 
 //上传文件
 func UploadFile(c *gin.Context, localfile string) (img string){
-	client, err := oss.New("oss-cn-shanghai.aliyuncs.com", "LTAI4FuzqYkEXt8c4EYZ7TRJ", "ZaXpqhJf13PFRG8AePWnB0OpB7LG2k")
+	client, err := oss.New("oss-cn-shanghai.aliyuncs.com", "1", "1")
 	if err != nil {
 		// HandleError(err)
 		fmt.Println(err)
@@ -100,7 +100,7 @@ func UploadFile(c *gin.Context, localfile string) (img string){
 
 //上传文件
 func UploadFile2(c *gin.Context, localfile string) (img string){
-	client, err := oss.New("oss-cn-shanghai.aliyuncs.com", "LTAI4FuzqYkEXt8c4EYZ7TRJ", "ZaXpqhJf13PFRG8AePWnB0OpB7LG2k")
+	client, err := oss.New("oss-cn-shanghai.aliyuncs.com", "1", "1")
 	if err != nil {
 		// HandleError(err)
 		fmt.Println(err)
@@ -124,7 +124,7 @@ func UploadFile2(c *gin.Context, localfile string) (img string){
 
 //获取存储空间列表
 func GetStorageList(c *gin.Context) {
-	client, err := oss.New("oss-cn-shenzhen.aliyuncs.com", "LTAI4FuzqYkEXt8c4EYZ7TRJ", "ZaXpqhJf13PFRG8AePWnB0OpB7LG2k")
+	client, err := oss.New("oss-cn-shenzhen.aliyuncs.com", "1", "1")
 	if err != nil {
 		// HandleError(err)
 		fmt.Println(err)
