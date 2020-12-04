@@ -9,7 +9,7 @@ import (
 func main() {
 
 	//设置GIN运行模式
-	gin.SetMode(gin.DebugMode)
+	gin.SetMode(gin.ReleaseMode)
 
 	//程序执行完关闭数据库连接
 	defer databases.Connect().Close()

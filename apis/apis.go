@@ -291,3 +291,15 @@ func SetRead(c *gin.Context){
 func ArticleCreate(c *gin.Context){
 	models.ArticleCreate(c)
 }
+
+func GetCardList(c *gin.Context){
+	models.GetCardList(c)
+}
+
+func UpdateCard(c *gin.Context){
+	models.UpdateCard(c)
+}
+
+func ChangeStatus2(c *gin.Context){
+	models.ChangeStatus2(c)
+}

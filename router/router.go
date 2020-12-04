@@ -100,6 +100,11 @@ func InitRouter() *gin.Engine {
 	router.POST("/setRead",apis.SetRead)
 	router.POST("/articleCreate",apis.ArticleCreate)
 
+	//会员卡后管理
+	router.GET("/getCardList",apis.GetCardList)
+	router.GET("/changeStatus2",apis.ChangeStatus2)
+	router.POST("/updateCard",apis.UpdateCard)
+
 	//小程序端
 	router.GET("/api/v1/getMerchant",v1.GetMerchant2)
 	router.GET("/api/v1/getOpenid",v1.GetOpenid)
@@ -109,7 +114,14 @@ func InitRouter() *gin.Engine {
 	router.GET("/api/v1/getMerchantList",v1.GetMerchantList)
 	router.GET("/api/v1/getServiceList",v1.GetServiceList)
 	router.GET("/api/v1/getPayPreview",v1.GetPayPreview)
+	router.GET("/api/v1/getPayPreview2",v1.GetPayPreview2)
+	router.GET("/api/v1/makeOrder",v1.MakeOrder)
 	router.GET("/api/v1/getOrderList",v1.GetOrderList)
+	router.GET("/api/v1/getCardList",v1.GetCardList)
+	router.GET("/api/v1/getVipInfo",v1.GetVipInfo)
+	router.POST("/api/v1/notify",v1.Notify)
+	router.POST("/api/v1/notify2",v1.Notify2)
+	router.GET("/api/v1/makeComment",v1.MakeComment)
 
 	return router
 }

@@ -571,8 +571,13 @@ func UpdateArticle(c *gin.Context){
 
 	if c.BindJSON(&article)==nil{
 		db := databases.Connect()
-		db.Table("articles").Update(&article)
-		c.JSON(200,gin.H{"code":200})
+		res := db.Table("articles").Where("article_id = ?",article.Article_id).Update(&article).Error
+		if res == nil{
+			c.JSON(200,gin.H{"code":200})
+		}else{
+			c.JSON(200,gin.H{"code":400})
+		}
+
 	}else{
 		c.JSON(200,gin.H{"code":400})
 	}
@@ -937,5 +942,57 @@ func ArticleCreate(c *gin.Context){
 		c.JSON(200,gin.H{"code":200})
 	}else{
 		c.JSON(200,gin.H{"code":400})
+	}
+}
+
+//会员卡结构体
+type Card struct{
+	Card_id int
+	Title string
+	Price int
+	Desc string
+	Days string
+	Status string
+}
+
+func GetCardList(c *gin.Context){
+	var card[] Card
+
+	db := databases.Connect()
+	db.Table("card").Find(&card).Scan(&card)
+
+	c.JSON(200,gin.H{"code":200,"data":card})
+}
+
+func UpdateCard(c *gin.Context){
+	var card Card
+
+	if c.BindJSON(&card) ==nil{
+		db := databases.Connect()
+		db.Debug().Table("card").Where("card_id=?",card.Card_id).Update(&card)
+
+		c.JSON(200,gin.H{"code":200})
+	}else{
+		c.JSON(200,gin.H{"code":300})
+	}
+
+}
+
+func ChangeStatus2(c *gin.Context){
+	var card Card
+
+	id, _ := strconv.Atoi(c.Request.FormValue("id"))
+	card.Card_id = id
+
+	status := c.Request.FormValue("status")
+	card.Status = status
+
+	db := databases.Connect()
+	res := db.Debug().Table("card").Where("card_id=?",card.Card_id).Update(&card).Error
+
+	if res == nil{
+		c.JSON(200,gin.H{"code":200})
+	}else{
+		c.JSON(200,gin.H{"code":300})
 	}
 }
