@@ -72,13 +72,13 @@ func ListFile(c *gin.Context) {
 
 //上传文件
 func UploadFile(c *gin.Context, localfile string) (img string){
-	client, err := oss.New("oss-cn-shanghai.aliyuncs.com", "1", "1")
+	client, err := oss.New("oss-cn-shanghai.aliyuncs.com", "88", "99")
 	if err != nil {
 		// HandleError(err)
 		fmt.Println(err)
 	}
 
-	bucket, err := client.Bucket("img-c-jason")
+	bucket, err := client.Bucket("piduopi")
 	if err != nil {
 		// HandleError(err)
 		fmt.Println(err)
@@ -92,21 +92,21 @@ func UploadFile(c *gin.Context, localfile string) (img string){
 	} else {
 		c.JSON(200, gin.H{
 			"code":   200,
-			"qrcode": "https://img-c-jason.oss-accelerate.aliyuncs.com/" + localfile,
+			"qrcode": "https://piduopi.oss-accelerate.aliyuncs.com/" + localfile,
 		})
-		return "https://img-c-jason.oss-accelerate.aliyuncs.com/" + localfile
+		return "https://piduopi.oss-accelerate.aliyuncs.com/" + localfile
 	}
 }
 
 //上传文件
 func UploadFile2(c *gin.Context, localfile string) (img string){
-	client, err := oss.New("oss-cn-shanghai.aliyuncs.com", "1", "1")
+	client, err := oss.New("oss-cn-shanghai.aliyuncs.com", "88", "99")
 	if err != nil {
 		// HandleError(err)
 		fmt.Println(err)
 	}
 
-	bucket, err := client.Bucket("img-c-jason")
+	bucket, err := client.Bucket("piduopi")
 	if err != nil {
 		// HandleError(err)
 		fmt.Println(err)
@@ -118,7 +118,7 @@ func UploadFile2(c *gin.Context, localfile string) (img string){
 		fmt.Println(err)
 		return ""
 	} else {
-		return "https://img-c-jason.oss-accelerate.aliyuncs.com/" + localfile
+		return "https://piduopi.oss-accelerate.aliyuncs.com/" + localfile
 	}
 }
 

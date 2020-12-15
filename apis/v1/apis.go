@@ -25,7 +25,7 @@ func GetMerchant2(c *gin.Context){
 	var merchant[] Merchant
 
 	db := databases.Connect()
-	db.Table("merchant").Find(&merchant)
+	db.Table("merchant").Where("status=?","1").Find(&merchant)
 	c.JSON(200,gin.H{"data":merchant})
 }
 
@@ -125,6 +125,8 @@ type Merchant2 struct {
 	Longitude   float32
 	Latitude    float32
 	Address     string
+	Stars int
+	Sales int
 }
 
 type Order struct{
@@ -137,8 +139,8 @@ type Order struct{
 func GetDetail(c *gin.Context){
 	var merchant Merchant2
 	var order[] Order
-	var count int
-	stars := 0
+	//var count int
+	//stars := 0
 	id := c.Request.FormValue("id")
 	id2 ,_ := strconv.Atoi(id)
 
@@ -146,19 +148,19 @@ func GetDetail(c *gin.Context){
 	db.Table("merchant").Where("merchant_id=?",id2).First(&merchant)
 
 	db.Table("order").Where("merchant_id=? AND status = ?",id2,1).Find(&order)
-	db.Table("order").Where("merchant_id=? AND status = ?",id2,1).Count(&count)
+	//db.Table("order").Where("merchant_id=? AND status = ?",id2,1).Count(&count)
 
-	for key , _ :=range order{
-		stars += order[key].Stars
-	}
+	//for key , _ :=range order{
+	//	stars += order[key].Stars
+	//}
+	//
+	//if len(order)!=0{
+	//	stars = stars/len(order)
+	//	stars := int(math.Floor(float64(stars)))
+	//	fmt.Println(stars)
+	//}
 
-	if len(order)!=0{
-		stars = stars/len(order)
-		stars := int(math.Floor(float64(stars)))
-		fmt.Println(stars)
-	}
-
-	c.JSON(200,gin.H{"code":200,"data":merchant,"count":count,"stars":stars})
+	c.JSON(200,gin.H{"code":200,"data":merchant})
 }
 
 //商户结构体
@@ -173,6 +175,7 @@ type Merchant3 struct {
 	Star int
 	Count int
 	Distant float32
+	Status string
 }
 
 func GetMerchantList(c *gin.Context){
@@ -183,7 +186,7 @@ func GetMerchantList(c *gin.Context){
 	page , _:= strconv.Atoi(curPage)
 	start := (page-1)*8
 	db := databases.Connect()
-	db.Table("merchant").Limit(8).Offset(start).Find(&merchant).Scan(&merchant)
+	db.Table("merchant").Where("status = ?","1").Limit(8).Offset(start).Find(&merchant).Scan(&merchant)
 
 	for key,value := range merchant{
 		db.Table("order").Where("merchant_id=? AND status = ?",value.Merchant_id,1).Find(&order)
@@ -340,6 +343,7 @@ type Order22 struct{
 	Price int
 	Discount int
 	Status int
+	Time int64
 }
 
 type Order33 struct{
@@ -358,6 +362,7 @@ func MakeOrder(c *gin.Context){
 	order.Service_id  = c.Request.FormValue("service_id")
 	order.Price ,_ = strconv.Atoi(c.Request.FormValue("price"))
 	order.Discount  , _= strconv.Atoi(c.Request.FormValue("discount"))
+	order.Time = time.Now().Unix()
 
 	db := databases.Connect()
 	if db.Table("order").Create(&order).Error == nil {

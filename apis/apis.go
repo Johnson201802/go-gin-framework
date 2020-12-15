@@ -104,7 +104,7 @@ func ImgUploads(c *gin.Context) {
 			UploadFile(c, f.Filename)
 			err := os.Remove(f.Filename)
 			db := databases.Connect()
-			db.Table("config").Where("config_id = ?", 5).Update("config_value","https://img-c-jason.oss-accelerate.aliyuncs.com/"+f.Filename)
+			db.Table("config").Where("config_id = ?", 5).Update("config_value","https://piduopi.oss-accelerate.aliyuncs.com/"+f.Filename)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -236,12 +236,24 @@ func DelMerchant(c *gin.Context){
 	models.DelMerchant(c)
 }
 
+func DelPresent(c *gin.Context){
+	models.DelPresent(c)
+}
+
 func CreateMerchant(c *gin.Context){
 	models.CreateMerchant(c)
 }
 
+func GetMerchantList55(c *gin.Context){
+	models.GetMerchantList55(c)
+}
+
 func FetchOneMerchant(c *gin.Context){
 	models.FetchOneMerchant(c)
+}
+
+func ChangeMerchantStatus(c *gin.Context){
+	models.ChangeMerchantStatus(c)
 }
 
 func UpdateMerchant(c *gin.Context){

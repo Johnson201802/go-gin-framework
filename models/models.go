@@ -597,10 +597,28 @@ type Merchant struct {
 	Create_time int64
 	ID          interface{}
 	Qrcode string
+	Stars string
+	Sales string
+}
+
+//商户结构体
+type Merchant9 struct {
+	Merchant_id int
+	Name        string
+	Mobile      string
+	Img1        string
+	Img2        string
+	Longitude   float32
+	Latitude    float32
+	Address     string
+	Order       int
+	Create_time int64
+	Qrcode string
+	Status string
 }
 
 func FetchMerchantList(c *gin.Context){
-	var merchant[] Merchant
+	var merchant[] Merchant9
 	var count int
 
 	page, _ := strconv.Atoi(c.Request.FormValue("page"))
@@ -611,14 +629,33 @@ func FetchMerchantList(c *gin.Context){
 
 	db := databases.Connect()
 	if title == "" {
-		db.Table("merchant").Limit(limit).Offset(start).Find(&merchant).Scan(&merchant)
+		db.Table("merchant").Limit(limit).Offset(start).Order("merchant_id desc").Find(&merchant).Scan(&merchant)
 	}else{
-		db.Table("merchant").Limit(limit).Offset(start).Where("title like ?",title).Find(&merchant).Scan(&merchant)
+		db.Table("merchant").Limit(limit).Offset(start).Where("title like ?",title).Order("merchant_id desc").Find(&merchant).Scan(&merchant)
 	}
 
 	db.Table("merchant").Count(&count)
 
 	c.JSON(200,gin.H{"code":200,"data":merchant,"total":count})
+}
+
+//商户结构体
+type Merchant34 struct {
+	Merchant_id int
+	Status string
+}
+func ChangeMerchantStatus(c *gin.Context){
+	var merchant Merchant34
+
+	id := c.Request.FormValue("id")
+	merchant.Status = c.Request.FormValue("status")
+	id2 ,_ := strconv.Atoi(id)
+	merchant.Merchant_id = id2
+
+	db := databases.Connect()
+	db.Table("merchant").Where("merchant_id=?",id).Updates(&merchant)
+	c.JSON(200,gin.H{"code":200})
+
 }
 
 func DelMerchant(c *gin.Context){
@@ -629,7 +666,7 @@ func DelMerchant(c *gin.Context){
 	merchant.Merchant_id = id2
 
 	db := databases.Connect()
-	db.Table("merchant").Delete(&merchant)
+	db.Table("merchant").Where("merchant_id=?",id2).Delete(&merchant)
 	c.JSON(200,gin.H{"code":200})
 }
 
@@ -646,6 +683,8 @@ type Merchant4 struct {
 	Order       int
 	Create_time int64
 	Qrcode string
+	Stars string
+	Sales string
 }
 
 func CreateMerchant(c *gin.Context){
@@ -672,6 +711,8 @@ func CreateMerchant(c *gin.Context){
 		merchant4.Order = merchant.Order
 		merchant4.Create_time = merchant.Create_time
 		merchant4.Qrcode = url
+		merchant4.Stars = merchant.Stars
+		merchant4.Sales = merchant.Sales
 
 		fmt.Println(id)
 		db.Table("merchant").Where("merchant_id=?",id).Update(&merchant4)
@@ -683,7 +724,7 @@ func CreateMerchant(c *gin.Context){
 }
 
 func FetchOneMerchant(c *gin.Context){
-	var merchant Merchant
+	var merchant Merchant4
 
 	id , _ := strconv.Atoi(c.Request.FormValue("id"))
 	merchant.Merchant_id = id
@@ -719,20 +760,54 @@ type Order struct{
 	Conment string
 }
 
+//订单结构体
+type Order22 struct{
+	Merchant_id int
+	Name string
+	Service_id string
+	User_id int
+	Nick_name string
+	Price float32
+	Status int
+	Stars int
+	Conment string
+	Time int
+}
+
 func FetchOrderList(c *gin.Context){
-	var order[] Order
+	var order[] Order22
 	var count int
 
 	page, _ := strconv.Atoi(c.Request.FormValue("page"))
 	limit, _ := strconv.Atoi(c.Request.FormValue("limit"))
 	start := (page-1)*limit
+	pid := c.Request.FormValue("pid")
+	timestamp := c.Request.FormValue("timestamp")
+	timestamp2 := c.Request.FormValue("timestamp2")
+	if pid=="" && timestamp=="" && timestamp2==""{
 
-	db := databases.Connect()
-	db.Table("order").Select("order.order_id, order.merchant_id, order.user_id, order.price, order.status, order.stars, order.conment, merchant.name, user.nick_name").Joins("join merchant on merchant.merchant_id = order.merchant_id").Joins("join user on user.user_id = order.user_id").Limit(limit).Offset(start).Find(&order).Scan(&order)
+		db := databases.Connect()
+		db.Table("order").Select("order.Id, order.merchant_id, order.user_id, order.price, order.status, order.stars, order.conment, order.time, merchant.name, user.nick_name").Joins("join merchant on merchant.merchant_id = order.merchant_id").Joins("join user on user.user_id = order.user_id").Limit(limit).Offset(start).Find(&order).Scan(&order)
 
-	db.Table("order").Count(&count)
+		db.Table("order").Count(&count)
 
-	c.JSON(200,gin.H{"code":200,"data":order,"total":count})
+		c.JSON(200,gin.H{"code":200,"data":order,"total":count})
+	}else{
+		// string转化为时间，layout必须为 "2006-01-02 15:04:05"
+		times, _ := time.Parse("2006-01-02 15:04:05", timestamp)
+		timeUnix := times.Unix()
+
+		times2, _ := time.Parse("2006-01-02 15:04:05", timestamp2)
+		timeUnix2 := times2.Unix()
+
+		db := databases.Connect()
+		db.Table("order").Where("order.merchant_id=? AND order.time>=? AND order.time<?",pid,timeUnix,timeUnix2).Select("order.Id, order.merchant_id, order.user_id, order.price, order.status, order.stars, order.conment, order.time, merchant.name, user.nick_name").Joins("join merchant on merchant.merchant_id = order.merchant_id").Joins("join user on user.user_id = order.user_id").Limit(limit).Offset(start).Find(&order).Scan(&order)
+
+		db.Table("order").Where("order.merchant_id=? AND order.time>=? AND order.time<?",pid,timeUnix,timeUnix2).Select("order.Id, order.merchant_id, order.user_id, order.price, order.status, order.stars, order.conment, order.time, merchant.name, user.nick_name").Joins("join merchant on merchant.merchant_id = order.merchant_id").Joins("join user on user.user_id = order.user_id").Count(&count)
+
+		c.JSON(200,gin.H{"code":200,"data":order,"total":count})
+	}
+
 
 }
 
@@ -744,7 +819,7 @@ func DelOrder(c *gin.Context){
 	order.Order_id = id2
 
 	db := databases.Connect()
-	db.Table("order").Delete(&order)
+	db.Table("order").Where("Id=?",id2).Delete(&order)
 	c.JSON(200,gin.H{"code":200})
 }
 
@@ -766,10 +841,11 @@ func FetchServicesList(c *gin.Context){
 
 	page, _ := strconv.Atoi(c.Request.FormValue("page"))
 	limit, _ := strconv.Atoi(c.Request.FormValue("limit"))
+	id, _ := strconv.Atoi(c.Request.FormValue("id"))
 	start := (page-1)*limit
 
 	db := databases.Connect()
-	db.Debug().Table("service").Select("service.service_id, service.service_name, service.icon, service.origin_price, service.now_price, service.pid, service.is_sale, merchant.name").Joins("join merchant on merchant.merchant_id = service.pid").Limit(limit).Offset(start).Find(&service).Scan(&service)
+	db.Debug().Table("service").Where("service.pid=?",id).Select("service.service_id, service.service_name, service.icon, service.origin_price, service.now_price, service.pid, service.is_sale, merchant.name").Joins("join merchant on merchant.merchant_id = service.pid").Limit(limit).Offset(start).Find(&service).Scan(&service)
 
 	db.Table("service").Count(&count)
 
@@ -813,8 +889,18 @@ type Service2 struct {
 	Is_sale string
 }
 
+//服务结构体
+type Service90 struct {
+	Service_name string
+	Icon string
+	Origin_price string
+	Now_price string
+	Pid int
+	Is_sale string
+}
+
 func CreateService(c *gin.Context){
-	var service Service2
+	var service Service90
 
 	if c.BindJSON(&service)==nil{
 		db := databases.Connect()
@@ -845,8 +931,8 @@ type Service3 struct {
 	Service_id int
 	Service_name string
 	Icon string
-	Origin_price string
-	Now_price string
+	Origin_price int
+	Now_price int
 	Pid int
 	Is_sale string
 }
@@ -994,5 +1080,79 @@ func ChangeStatus2(c *gin.Context){
 		c.JSON(200,gin.H{"code":200})
 	}else{
 		c.JSON(200,gin.H{"code":300})
+	}
+}
+
+type Services33 struct{
+	Service_id int
+}
+
+func DelPresent(c *gin.Context){
+	var service Services33
+
+	id, _ := strconv.Atoi(c.Request.FormValue("id"))
+	db := databases.Connect()
+	res := db.Debug().Table("service").Where("service_id=?",id).Delete(&service).Error
+
+	if res == nil{
+		c.JSON(200,gin.H{"code":200})
+	}else{
+		c.JSON(200,gin.H{"code":300})
+	}
+}
+
+type Merchant66 struct {
+	Name string
+	Mobile string
+	Address string
+	Sales int
+	Latitude string
+	Longitude string
+}
+
+func GetMerchantList55(c *gin.Context){
+	var merchant[] Merchant66
+
+	db := databases.Connect()
+	res := db.Table("merchant").Where("latitude != 0 and longitude != 0").Find(&merchant).Error
+
+	if res==nil{
+		c.JSON(200,gin.H{
+			"code":200,
+			"data":merchant,
+			"msg":"ok",
+		})
+	}else{
+		c.JSON(200,gin.H{
+			"code":300,
+			"msg":"error",
+		})
+	}
+}
+
+func GetAllInfo(c *gin.Context){
+	db := databases.Connect()
+	var count int
+	res1 := db.Table("user").Count(&count).Error
+	if res1!=nil{
+		count = 0
+	}
+
+	var member_count int
+	res2 := db.Table("user").Where("is_vip=1").Count(&member_count).Error
+	if res2 != nil {
+		member_count = 0
+	}
+
+	var active_count int
+	res3 := db.Table("user").Where("is_vip=1").Count(&active_count).Error
+	if res3 != nil {
+		active_count = 0
+	}
+
+	var merchant_count int
+	res4 := db.Table("merchant").Count(&merchant_count).Error
+	if res4 != nil {
+		active_count = 0
 	}
 }

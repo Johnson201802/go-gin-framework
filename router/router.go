@@ -82,6 +82,7 @@ func InitRouter() *gin.Engine {
 	router.POST("/createMerchant",apis.CreateMerchant)
 	router.GET("/fetchOneMerchant",apis.FetchOneMerchant)
 	router.POST("/updateMerchant",apis.UpdateMerchant)
+	router.POST("/changeMerchantStatus",apis.ChangeMerchantStatus)
 
 	//订单管理
 	router.GET("/fetchOrderList",apis.FetchOrderList)
@@ -93,6 +94,7 @@ func InitRouter() *gin.Engine {
 	router.POST("/createService",apis.CreateService)
 	router.GET("/getMerchant",apis.GetMerchant)
 	router.POST("/updateService",apis.UpdateService)
+	router.DELETE("/delPresent",apis.DelPresent)
 
 	//是否有新信息
 	router.GET("/getNewMsg",apis.GetNewMsg)
@@ -105,7 +107,10 @@ func InitRouter() *gin.Engine {
 	router.GET("/changeStatus2",apis.ChangeStatus2)
 	router.POST("/updateCard",apis.UpdateCard)
 
-	//小程序端
+	//首页数据请求
+	router.GET("/getMerchantList55",apis.GetMerchantList55)
+
+	//小程序端fetchOneMerchant
 	router.GET("/api/v1/getMerchant",v1.GetMerchant2)
 	router.GET("/api/v1/getOpenid",v1.GetOpenid)
 	router.GET("/api/v1/getPhoneNumber",v1.GetPhoneNumber)
