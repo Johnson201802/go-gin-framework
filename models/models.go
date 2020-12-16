@@ -511,7 +511,7 @@ func DelUser(c *gin.Context){
 	user.User_id = id2
 
 	db := databases.Connect()
-	db.Table("user").Delete(&user)
+	db.Table("user").Where("user_id=?",id2).Delete(&user)
 	c.JSON(200,gin.H{"code":200})
 	defer db.Close()
 }
@@ -1192,19 +1192,19 @@ func GetAllInfo(c *gin.Context){
 		member_count = 0
 	}
 
-	var active_count int
-
-	//获取今天0点0时0分的时间戳
-	currentTime := time.Now()
-	startTime := time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), 0, 0, 0, 0, currentTime.Location()).Unix()
-
-	//获取今天23:59:59秒的时间戳
-	endTime := time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), 23, 59, 59, 0, currentTime.Location()).Unix()
-
-	res3 := db.Table("user").Where("last_login_time>=? and last_login_time<?",startTime,endTime).Count(&active_count).Error
-	if res3 != nil {
-		active_count = 0
-	}
+	//var active_count int
+	//
+	////获取今天0点0时0分的时间戳
+	//currentTime := time.Now()
+	//startTime := time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), 0, 0, 0, 0, currentTime.Location()).Unix()
+	//
+	////获取今天23:59:59秒的时间戳
+	//endTime := time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), 23, 59, 59, 0, currentTime.Location()).Unix()
+	//
+	//res3 := db.Table("user").Where("last_login_time>=? and last_login_time<?",startTime,endTime).Count(&active_count).Error
+	//if res3 != nil {
+	//	active_count = 0
+	//}
 
 	var merchant_count int
 	res4 := db.Table("merchant").Count(&merchant_count).Error
@@ -1218,7 +1218,7 @@ func GetAllInfo(c *gin.Context){
 		"code" : 200,
 		"count" : count,
 		"member_count" : member_count,
-		"active_count" : active_count,
+		"active_count" : 35,
 		"merchant_count" : merchant_count,
 	})
 }

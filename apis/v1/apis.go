@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/iGoogle-ink/gotil"
-	"math"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -174,15 +173,15 @@ type Merchant3 struct {
 	Longitude   float32
 	Latitude    float32
 	Address     string
-	Star int
-	Count int
+	Stars int
+	Sales int
 	Distant float32
 	Status string
 }
 
 func GetMerchantList(c *gin.Context){
 	var merchant[] Merchant3
-	var order[] Order
+	//var order[] Order
 
 	curPage := c.Request.FormValue("curPage")
 	page , _:= strconv.Atoi(curPage)
@@ -190,20 +189,20 @@ func GetMerchantList(c *gin.Context){
 	db := databases.Connect()
 	db.Table("merchant").Where("status = ?","1").Limit(8).Offset(start).Find(&merchant).Scan(&merchant)
 
-	for key,value := range merchant{
-		db.Table("order").Where("merchant_id=? AND status = ?",value.Merchant_id,1).Find(&order)
-		db.Table("order").Where("merchant_id=? AND status = ?",value.Merchant_id,1).Count(&merchant[key].Count)
-
-		for key2 , _ :=range order{
-			merchant[key].Star += order[key2].Stars
-		}
-
-		if len(order)!=0{
-			merchant[key].Star = merchant[key].Star/len(order)
-			merchant[key].Star = int(math.Floor(float64(merchant[key].Star)))
-			fmt.Println(merchant[key].Star)
-		}
-	}
+	//for key,value := range merchant{
+	//	db.Table("order").Where("merchant_id=? AND status = ?",value.Merchant_id,1).Find(&order)
+	//	db.Table("order").Where("merchant_id=? AND status = ?",value.Merchant_id,1).Count(&merchant[key].Count)
+	//
+	//	for key2 , _ :=range order{
+	//		merchant[key].Star += order[key2].Stars
+	//	}
+	//
+	//	if len(order)!=0{
+	//		merchant[key].Star = merchant[key].Star/len(order)
+	//		merchant[key].Star = int(math.Floor(float64(merchant[key].Star)))
+	//		fmt.Println(merchant[key].Star)
+	//	}
+	//}
 	c.JSON(200,gin.H{"code":200,"data":merchant})
 }
 
@@ -267,7 +266,7 @@ func GetOrderList(c *gin.Context){
 	start := (page-1)*6
 
 	db := databases.Connect()
-	db.Debug().Table("order").Select("order.Id, order.merchant_id, order.service_id, order.user_id, order.price, order.status, order.discount, merchant.name").Joins("join merchant on merchant.merchant_id = order.merchant_id").Where("order.user_id = ? AND order.status != 0",id).Offset(start).Limit(6).Find(&order).Scan(&order)
+	db.Debug().Table("order").Select("order.Id, order.merchant_id, order.service_id, order.user_id, order.price, order.status, order.discount, merchant.name").Joins("join merchant on merchant.merchant_id = order.merchant_id").Where("order.user_id = ?",id).Offset(start).Limit(6).Find(&order).Scan(&order)
 
 	for key , item := range order{
 		arr := strings.Split(item.Service_id,",")

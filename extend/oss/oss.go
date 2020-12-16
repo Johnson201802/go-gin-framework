@@ -7,8 +7,8 @@ import (
 	"os"
 )
 
-const key = "88"
-const secret = "99"
+const key = "33"
+const secret = "44"
 
 func HandleError(err error) {
 	fmt.Println("Error:", err)
