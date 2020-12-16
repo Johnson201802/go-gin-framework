@@ -24,7 +24,6 @@ func IndexApi(c *gin.Context) {
 	//生成TOKEN
 	token, _ := tools.CreateToken(uid2, "johnson2018092789728376273672364wey")
 	red := databases.Connect_redis()
-	defer red.Close()
 	var err error
 	_, err = red.Do("SET", uid, token)
 	_, err = red.Do("expire", uid, 7200) //两个小时过期
@@ -47,6 +46,7 @@ func IndexApi(c *gin.Context) {
 			"msg":  "",
 		})
 	}
+	defer red.Close()
 }
 
 func GetInfo(c *gin.Context) {
@@ -88,6 +88,7 @@ func GetMchConfig(c *gin.Context) {
 
 func ImgUploads(c *gin.Context) {
 	f, err := c.FormFile("file")
+	db := databases.Connect()
 	if err != nil {
 		c.JSON(200, gin.H{
 			"error": err,
@@ -103,13 +104,13 @@ func ImgUploads(c *gin.Context) {
 		} else {
 			UploadFile(c, f.Filename)
 			err := os.Remove(f.Filename)
-			db := databases.Connect()
 			db.Table("config").Where("config_id = ?", 5).Update("config_value","https://piduopi.oss-accelerate.aliyuncs.com/"+f.Filename)
 			if err != nil {
 				fmt.Println(err)
 			}
 		}
 	}
+	defer db.Close()
 }
 
 func SendMSM(c *gin.Context) {
@@ -314,4 +315,8 @@ func UpdateCard(c *gin.Context){
 
 func ChangeStatus2(c *gin.Context){
 	models.ChangeStatus2(c)
+}
+
+func GetAllInfo(c *gin.Context){
+	models.GetAllInfo(c)
 }

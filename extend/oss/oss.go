@@ -7,6 +7,9 @@ import (
 	"os"
 )
 
+const key = "88"
+const secret = "99"
+
 func HandleError(err error) {
 	fmt.Println("Error:", err)
 	os.Exit(-1)
@@ -72,7 +75,7 @@ func ListFile(c *gin.Context) {
 
 //上传文件
 func UploadFile(c *gin.Context, localfile string) (img string){
-	client, err := oss.New("oss-cn-shanghai.aliyuncs.com", "88", "99")
+	client, err := oss.New("oss-cn-shanghai.aliyuncs.com", key, secret)
 	if err != nil {
 		// HandleError(err)
 		fmt.Println(err)
@@ -100,7 +103,7 @@ func UploadFile(c *gin.Context, localfile string) (img string){
 
 //上传文件
 func UploadFile2(c *gin.Context, localfile string) (img string){
-	client, err := oss.New("oss-cn-shanghai.aliyuncs.com", "88", "99")
+	client, err := oss.New("oss-cn-shanghai.aliyuncs.com", key, secret)
 	if err != nil {
 		// HandleError(err)
 		fmt.Println(err)

@@ -27,6 +27,7 @@ func GetMerchant2(c *gin.Context){
 	db := databases.Connect()
 	db.Table("merchant").Where("status=?","1").Find(&merchant)
 	c.JSON(200,gin.H{"data":merchant})
+	defer db.Close()
 }
 
 type User struct{
@@ -58,6 +59,7 @@ func GetOpenid(c *gin.Context){
 	}else{
 		c.JSON(200,gin.H{"code":200,"user":user,"session_id":res.SessionKey,"openid":res.OpenId})
 	}
+	defer db.Close()
 
 }
 

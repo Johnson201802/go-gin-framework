@@ -109,6 +109,7 @@ func InitRouter() *gin.Engine {
 
 	//首页数据请求
 	router.GET("/getMerchantList55",apis.GetMerchantList55)
+	router.GET("/getAllInfo",apis.GetAllInfo)
 
 	//小程序端fetchOneMerchant
 	router.GET("/api/v1/getMerchant",v1.GetMerchant2)

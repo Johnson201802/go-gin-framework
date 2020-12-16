@@ -33,17 +33,18 @@ func GetAdmin(Admin_name string, Admin_pwd string) (flag bool, id int) {
 	var admin Admin
 	db := databases.Connect()
 	db.Table("admin").Where("admin_name = ?", Admin_name).First(&admin).Scan(&admin)
-	fmt.Println(admin.Admin_name + "___" + admin.Admin_pwd)
 	if admin.Admin_name == Admin_name {
 		if admin.Admin_pwd == Admin_pwd {
+			defer db.Close()
 			return true, admin.Id
 		} else {
+			defer db.Close()
 			return false, 0
 		}
 	} else {
+		defer db.Close()
 		return false, 0
 	}
-
 }
 
 //连接REDIS
@@ -84,6 +85,7 @@ func GetBaseconfig(c *gin.Context) {
 		"code": 200,
 		"data": Baseconfig,
 	})
+	defer db.Close()
 }
 
 func GetMsmConfig(c *gin.Context) {
@@ -103,6 +105,7 @@ func GetMsmConfig(c *gin.Context) {
 		"code": 200,
 		"data": MsmConfig,
 	})
+	defer db.Close()
 }
 
 func GetMchConfig(c *gin.Context) {
@@ -118,6 +121,7 @@ func GetMchConfig(c *gin.Context) {
 	db.Table("config").Where("config_id = ?", 12).First(&config).Scan(&config)
 	MchConfig["url"] = config.Config_value
 
+	defer db.Close()
 	c.JSON(200, gin.H{
 		"code": 200,
 		"data": MchConfig,
@@ -142,6 +146,7 @@ func SaveConfigBase(c *gin.Context) {
 		db.Table("config").Where("config_id = ?", 13).Update("config_value",configBase.Tell_content)
 		db.Table("config").Where("config_id = ?", 8).Update("config_value",configBase.Telphone)
 		c.JSON(200,gin.H{"code":200,"msg":"OK！"})
+		defer db.Close()
 	}else{
 		c.JSON(200,gin.H{"msg":"非法请求！"})
 	}
@@ -162,6 +167,7 @@ func SaveConfigSms(c *gin.Context){
 		db.Table("config").Where("config_id = ?", 2).Update("config_value",configSms.Sms_app_key)
 		db.Table("config").Where("config_id = ?", 3).Update("config_value",configSms.Sms_sign)
 		c.JSON(200,gin.H{"code":200,"msg":"OK！"})
+		defer db.Close()
 	}else{
 		c.JSON(200,gin.H{"msg":"非法请求！"})
 	}
@@ -181,6 +187,7 @@ func SaveConfigMch(c *gin.Context){
 		db.Table("config").Where("config_id = ?", 11).Update("config_value",configMch.Mch_key)
 		db.Table("config").Where("config_id = ?", 12).Update("config_value",configMch.Url)
 		c.JSON(200,gin.H{"code":200,"msg":"OK！"})
+		defer db.Close()
 	}else{
 		c.JSON(200,gin.H{"msg":"非法请求！"})
 	}
@@ -213,6 +220,7 @@ func GetAuthList(c *gin.Context){
 	db.Table("auth_rule").Limit(limit).Offset(start).Order("Id desc").Find(&authrules).Scan(&authrules)
 	db.Table("auth_rule").Count(&count)
 	c.JSON(200,gin.H{"data":authrules,"total":count})
+	defer db.Close()
 
 }
 
@@ -223,6 +231,7 @@ func DelRule(c *gin.Context){
 	db := databases.Connect()
 	db.Table("auth_rule").Where("id = ?", id).Delete(&authrule)
 	c.JSON(200,gin.H{"code":200,"msg":"ok"})
+	defer db.Close()
 }
 
 func CreateRule(c *gin.Context){
@@ -232,6 +241,7 @@ func CreateRule(c *gin.Context){
 		db := databases.Connect()
 		db.Table("auth_rule").Create(&rule)
 		c.JSON(200,gin.H{"code":200,"msg":"OK！"})
+		defer db.Close()
 	}else{
 		c.JSON(200,gin.H{"msg":"非法请求！"})
 	}
@@ -243,6 +253,7 @@ func UpdateRule(c *gin.Context){
 		db := databases.Connect()
 		db.Table("auth_rule").Update(&rule)
 		c.JSON(200,gin.H{"code":200,"msg":"OK！"})
+		defer db.Close()
 	}else{
 		c.JSON(200,gin.H{"msg":"非法请求！"})
 	}
@@ -268,6 +279,7 @@ func GetAdminList(c *gin.Context){
 	db.Table("admin").Limit(limit).Offset(start).Order("Id desc").Select("admin.*, auth_group.title").Joins("left join auth_group on auth_group.id = admin.group_id").Find(&admin).Scan(&admin)
 	db.Table("admin").Count(&count)
 	c.JSON(200,gin.H{"data":admin,"total":count})
+	defer db.Close()
 }
 
 type Grouplist struct{
@@ -284,6 +296,7 @@ func GetGroupList(c *gin.Context){
 	db := databases.Connect()
 	db.Table("auth_group").Find(&grouplist)
 	c.JSON(200,gin.H{"code":200,"data":grouplist})
+	defer db.Close()
 }
 
 //定义管理员结构体2
@@ -307,6 +320,7 @@ func CreateAdmin(c *gin.Context){
 		db := databases.Connect()
 		db.Table("admin").Create(&admin2)
 		c.JSON(200,gin.H{"code":200,"msg":"OK！"})
+		defer db.Close()
 	}else{
 		c.JSON(200,gin.H{"msg":"非法请求！"})
 	}
@@ -319,6 +333,7 @@ func DelAdmin(c *gin.Context){
 	db := databases.Connect()
 	db.Table("admin").Where("id = ?", id).Delete(&admin2)
 	c.JSON(200,gin.H{"code":200,"msg":"ok"})
+	defer db.Close()
 }
 
 func UpdateAdmin(c *gin.Context){
@@ -327,6 +342,7 @@ func UpdateAdmin(c *gin.Context){
 		db := databases.Connect()
 		db.Table("admin").Where("id = ?",admin2.Id).Update(&admin2)
 		c.JSON(200,gin.H{"code":200,"msg":"OK！"})
+		defer db.Close()
 	}else{
 		c.JSON(200,gin.H{"msg":"非法请求！"})
 	}
@@ -379,6 +395,7 @@ func GetRoleList(c *gin.Context){
 
 	db.Table("auth_group").Count(&count)
 	c.JSON(200,gin.H{"data":auth_group,"total":count})
+	defer db.Close()
 }
 
 
@@ -388,6 +405,7 @@ func GetRuleList(c *gin.Context){
 	db := databases.Connect()
 	db.Table("auth_rule").Find(&authrule)
 	c.JSON(200,gin.H{"code":200,"data":authrule})
+	defer db.Close()
 }
 
 type Auth_group2 struct{
@@ -405,6 +423,7 @@ func AddRole(c *gin.Context){
 		db := databases.Connect()
 		db.Table("auth_group").Create(&authgroup)
 		c.JSON(200,gin.H{"code":200})
+		defer db.Close()
 	}
 }
 
@@ -417,6 +436,7 @@ func DelRole(c *gin.Context){
 	db := databases.Connect()
 	db.Table("auth_group").Delete(&authgroup)
 	c.JSON(200,gin.H{"code":200})
+	defer db.Close()
 }
 
 func GetOneRole(c *gin.Context){
@@ -429,6 +449,7 @@ func GetOneRole(c *gin.Context){
 
 	ids := strings.Split(authgroup.Rules,",")
 	c.JSON(200,gin.H{"code":200,"data":ids})
+	defer db.Close()
 }
 
 func UpdateRole(c *gin.Context){
@@ -438,6 +459,7 @@ func UpdateRole(c *gin.Context){
 		db := databases.Connect()
 		db.Table("auth_group").Where("id=?",authgroup.Id).Update(&authgroup)
 		c.JSON(200,gin.H{"code":200})
+		defer db.Close()
 	}
 }
 
@@ -478,6 +500,7 @@ func FetchUserList(c *gin.Context){
 	db.Table("user").Count(&count)
 
 	c.JSON(200,gin.H{"code":200,"data":user,"total":count})
+	defer db.Close()
 }
 
 func DelUser(c *gin.Context){
@@ -490,6 +513,7 @@ func DelUser(c *gin.Context){
 	db := databases.Connect()
 	db.Table("user").Delete(&user)
 	c.JSON(200,gin.H{"code":200})
+	defer db.Close()
 }
 
 //文章结构体
@@ -527,7 +551,7 @@ func FetchArticleList(c *gin.Context){
 	db.Table("articles").Count(&count)
 
 	c.JSON(200,gin.H{"code":200,"data":article,"total":count})
-
+	defer db.Close()
 }
 
 func DelArticle(c *gin.Context){
@@ -540,6 +564,7 @@ func DelArticle(c *gin.Context){
 	db := databases.Connect()
 	db.Table("articles").Delete(&article)
 	c.JSON(200,gin.H{"code":200})
+	defer db.Close()
 }
 
 func CreateArticle(c *gin.Context){
@@ -550,6 +575,7 @@ func CreateArticle(c *gin.Context){
 		db := databases.Connect()
 		db.Table("articles").Create(&article)
 		c.JSON(200,gin.H{"code":200})
+		defer db.Close()
 	}else{
 		c.JSON(200,gin.H{"code":400})
 	}
@@ -564,6 +590,7 @@ func FetchOneArticle(c *gin.Context){
 	db := databases.Connect()
 	db.Table("articles").Where("article_id=?",id2).First(&article)
 	c.JSON(200,gin.H{"code":200,"data":article})
+	defer db.Close()
 }
 
 func UpdateArticle(c *gin.Context){
@@ -577,6 +604,7 @@ func UpdateArticle(c *gin.Context){
 		}else{
 			c.JSON(200,gin.H{"code":400})
 		}
+		defer db.Close()
 
 	}else{
 		c.JSON(200,gin.H{"code":400})
@@ -637,6 +665,7 @@ func FetchMerchantList(c *gin.Context){
 	db.Table("merchant").Count(&count)
 
 	c.JSON(200,gin.H{"code":200,"data":merchant,"total":count})
+	defer db.Close()
 }
 
 //商户结构体
@@ -655,7 +684,7 @@ func ChangeMerchantStatus(c *gin.Context){
 	db := databases.Connect()
 	db.Table("merchant").Where("merchant_id=?",id).Updates(&merchant)
 	c.JSON(200,gin.H{"code":200})
-
+	defer db.Close()
 }
 
 func DelMerchant(c *gin.Context){
@@ -668,6 +697,7 @@ func DelMerchant(c *gin.Context){
 	db := databases.Connect()
 	db.Table("merchant").Where("merchant_id=?",id2).Delete(&merchant)
 	c.JSON(200,gin.H{"code":200})
+	defer db.Close()
 }
 
 //商户结构体
@@ -720,6 +750,7 @@ func CreateMerchant(c *gin.Context){
 		_ = os.Remove(img)
 
 		c.JSON(200,gin.H{"code":200})
+		defer db.Close()
 	}
 }
 
@@ -731,6 +762,7 @@ func FetchOneMerchant(c *gin.Context){
 	db := databases.Connect()
 	db.Table("merchant").Where("merchant_id=?",id).First(&merchant)
 	c.JSON(200,gin.H{"code":200,"data":merchant})
+	defer db.Close()
 }
 
 
@@ -741,6 +773,7 @@ func UpdateMerchant(c *gin.Context){
 		db := databases.Connect()
 		db.Table("merchant").Where("merchant_id=?",merchant.Merchant_id).Update(&merchant)
 		c.JSON(200,gin.H{"code":200})
+		defer db.Close()
 	}else{
 		c.JSON(200,gin.H{"code":400})
 	}
@@ -790,7 +823,7 @@ func FetchOrderList(c *gin.Context){
 		db.Table("order").Select("order.Id, order.merchant_id, order.user_id, order.price, order.status, order.stars, order.conment, order.time, merchant.name, user.nick_name").Joins("join merchant on merchant.merchant_id = order.merchant_id").Joins("join user on user.user_id = order.user_id").Limit(limit).Offset(start).Find(&order).Scan(&order)
 
 		db.Table("order").Count(&count)
-
+		defer db.Close()
 		c.JSON(200,gin.H{"code":200,"data":order,"total":count})
 	}else{
 		// string转化为时间，layout必须为 "2006-01-02 15:04:05"
@@ -804,10 +837,9 @@ func FetchOrderList(c *gin.Context){
 		db.Table("order").Where("order.merchant_id=? AND order.time>=? AND order.time<?",pid,timeUnix,timeUnix2).Select("order.Id, order.merchant_id, order.user_id, order.price, order.status, order.stars, order.conment, order.time, merchant.name, user.nick_name").Joins("join merchant on merchant.merchant_id = order.merchant_id").Joins("join user on user.user_id = order.user_id").Limit(limit).Offset(start).Find(&order).Scan(&order)
 
 		db.Table("order").Where("order.merchant_id=? AND order.time>=? AND order.time<?",pid,timeUnix,timeUnix2).Select("order.Id, order.merchant_id, order.user_id, order.price, order.status, order.stars, order.conment, order.time, merchant.name, user.nick_name").Joins("join merchant on merchant.merchant_id = order.merchant_id").Joins("join user on user.user_id = order.user_id").Count(&count)
-
+		defer db.Close()
 		c.JSON(200,gin.H{"code":200,"data":order,"total":count})
 	}
-
 
 }
 
@@ -820,6 +852,7 @@ func DelOrder(c *gin.Context){
 
 	db := databases.Connect()
 	db.Table("order").Where("Id=?",id2).Delete(&order)
+	defer db.Close()
 	c.JSON(200,gin.H{"code":200})
 }
 
@@ -849,6 +882,7 @@ func FetchServicesList(c *gin.Context){
 
 	db.Table("service").Count(&count)
 
+	defer db.Close()
 	c.JSON(200,gin.H{"code":200,"data":service,"total":count})
 
 }
@@ -875,6 +909,7 @@ func ChangeStatus(c *gin.Context){
 	db := databases.Connect()
 	db.Table("service").Where("service_id=?",id).Update(&service)
 
+	defer db.Close()
 	c.JSON(200,gin.H{"code":200})
 }
 
@@ -906,6 +941,7 @@ func CreateService(c *gin.Context){
 		db := databases.Connect()
 		db.Table("service").Create(&service)
 
+		defer db.Close()
 		c.JSON(200,gin.H{"code":200})
 	}else{
 		c.JSON(200,gin.H{"code":400})
@@ -923,6 +959,7 @@ func GetMerchant(c *gin.Context){
 
 	db := databases.Connect()
 	db.Table("merchant").Select("merchant_id, name").Find(&merchant).Scan(&merchant)
+	defer db.Close()
 	c.JSON(200,gin.H{"code":200, "data":merchant})
 }
 
@@ -940,13 +977,15 @@ type Service3 struct {
 func UpdateService(c *gin.Context){
 	var service Service3
 
+	db := databases.Connect()
 	if c.BindJSON(&service)==nil{
-		db := databases.Connect()
+
 		db.Table("service").Where("service_id=?",service.Service_id).Update(&service)
 		c.JSON(200,gin.H{"code":200})
 	}else{
 		c.JSON(200,gin.H{"code":400})
 	}
+	defer db.Close()
 }
 
 //消息结构体
@@ -967,6 +1006,7 @@ func GetNewMsg(c *gin.Context){
 	db := databases.Connect()
 	db.Table("question").Where("is_read = ?", 0).Count(&count)
 
+	defer db.Close()
 	if count == 0{
 		c.JSON(200,gin.H{"code":300})
 	}else{
@@ -987,6 +1027,7 @@ func GetQuestionList(c *gin.Context){
 	err := db.Debug().Table("question").Select("question.question_id, question.user_id2, question.content, question.time, question.is_read, user.nick_name, user.avatar, user.phone, user.user_id").Joins("join user on user.user_id = question.user_id2").Order("question_id desc").Limit(limit).Offset(start).Find(&question).Scan(&question).Error
 	db.Table("question").Count(&count)
 
+	defer db.Close()
 	if err == nil{
 		c.JSON(200,gin.H{"code":200,"data":question,"count":count})
 	}else{
@@ -1004,6 +1045,7 @@ func SetRead(c *gin.Context){
 	db := databases.Connect()
 	err := db.Debug().Table("question").Where("question_id = ?",id).Update(&question).Error
 
+	defer db.Close()
 	if err != nil{
 		c.JSON(200,gin.H{"code":300,"msg":"error"})
 	}else{
@@ -1025,6 +1067,7 @@ func ArticleCreate(c *gin.Context){
 		db := databases.Connect()
 		db.Table("question").Create(&question)
 
+		defer db.Close()
 		c.JSON(200,gin.H{"code":200})
 	}else{
 		c.JSON(200,gin.H{"code":400})
@@ -1047,6 +1090,7 @@ func GetCardList(c *gin.Context){
 	db := databases.Connect()
 	db.Table("card").Find(&card).Scan(&card)
 
+	defer db.Close()
 	c.JSON(200,gin.H{"code":200,"data":card})
 }
 
@@ -1057,6 +1101,7 @@ func UpdateCard(c *gin.Context){
 		db := databases.Connect()
 		db.Debug().Table("card").Where("card_id=?",card.Card_id).Update(&card)
 
+		defer db.Close()
 		c.JSON(200,gin.H{"code":200})
 	}else{
 		c.JSON(200,gin.H{"code":300})
@@ -1076,6 +1121,7 @@ func ChangeStatus2(c *gin.Context){
 	db := databases.Connect()
 	res := db.Debug().Table("card").Where("card_id=?",card.Card_id).Update(&card).Error
 
+	defer db.Close()
 	if res == nil{
 		c.JSON(200,gin.H{"code":200})
 	}else{
@@ -1094,6 +1140,7 @@ func DelPresent(c *gin.Context){
 	db := databases.Connect()
 	res := db.Debug().Table("service").Where("service_id=?",id).Delete(&service).Error
 
+	defer db.Close()
 	if res == nil{
 		c.JSON(200,gin.H{"code":200})
 	}else{
@@ -1116,6 +1163,7 @@ func GetMerchantList55(c *gin.Context){
 	db := databases.Connect()
 	res := db.Table("merchant").Where("latitude != 0 and longitude != 0").Find(&merchant).Error
 
+	defer db.Close()
 	if res==nil{
 		c.JSON(200,gin.H{
 			"code":200,
@@ -1145,7 +1193,15 @@ func GetAllInfo(c *gin.Context){
 	}
 
 	var active_count int
-	res3 := db.Table("user").Where("is_vip=1").Count(&active_count).Error
+
+	//获取今天0点0时0分的时间戳
+	currentTime := time.Now()
+	startTime := time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), 0, 0, 0, 0, currentTime.Location()).Unix()
+
+	//获取今天23:59:59秒的时间戳
+	endTime := time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), 23, 59, 59, 0, currentTime.Location()).Unix()
+
+	res3 := db.Table("user").Where("last_login_time>=? and last_login_time<?",startTime,endTime).Count(&active_count).Error
 	if res3 != nil {
 		active_count = 0
 	}
@@ -1153,6 +1209,16 @@ func GetAllInfo(c *gin.Context){
 	var merchant_count int
 	res4 := db.Table("merchant").Count(&merchant_count).Error
 	if res4 != nil {
-		active_count = 0
+		merchant_count = 0
 	}
+
+	defer db.Close()
+
+	c.JSON(200,gin.H{
+		"code" : 200,
+		"count" : count,
+		"member_count" : member_count,
+		"active_count" : active_count,
+		"merchant_count" : merchant_count,
+	})
 }

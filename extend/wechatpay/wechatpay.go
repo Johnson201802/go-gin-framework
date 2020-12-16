@@ -106,6 +106,7 @@ func GetInit(c *gin.Context){
 
 
 	c.JSON(200,gin.H{"timeStamp":timeStamp,"nonceStr":wxRsp.NonceStr,"package":packages,"paySign":paySign})
+	defer db.Close()
 }
 
 type Order struct{
@@ -213,6 +214,7 @@ func GetInit2(c *gin.Context){
 
 
 	c.JSON(200,gin.H{"timeStamp":timeStamp,"nonceStr":wxRsp.NonceStr,"package":packages,"paySign":paySign,"order_id":order.Id})
+	defer db.Close()
 }
 
 type User3 struct{
@@ -252,7 +254,7 @@ func Notify(c *gin.Context) string{
 		if err != nil {
 		xlog.Debug("err:", err)
 	}
-
+		db := databases.Connect()
 		xlog.Debug("bodyMap:", bodyMap)
 		arr := strings.Split(bodyMap.Get("out_trade_no"), "-")
 		mounths ,_ := strconv.Atoi(arr[0])
@@ -262,7 +264,7 @@ func Notify(c *gin.Context) string{
 		if err != nil {
 			xlog.Debug("err:", err)
 		}else{
-			db := databases.Connect()
+
 			db.Table("user").Where("open_id=?",user.Open_id).First(&user).Scan(&user)
 
 			if user.Is_vip != "1"{
@@ -277,7 +279,9 @@ func Notify(c *gin.Context) string{
 
 		rsp.ReturnCode = gopay.SUCCESS
 		rsp.ReturnMsg = "OK"
+		defer db.Close()
 		return rsp.ToXmlString()
+
 }
 
 //异步通知回调2
@@ -312,6 +316,7 @@ func Notify2(c *gin.Context) string{
 		xlog.Debug("err:", err)
 	}
 
+	db := databases.Connect()
 	xlog.Debug("bodyMap:", bodyMap)
 	out_trade_no := bodyMap.Get("out_trade_no")
 	openid := bodyMap.Get("openid")
@@ -320,7 +325,7 @@ func Notify2(c *gin.Context) string{
 	if err != nil {
 		xlog.Debug("err:", err)
 	}else{
-		db := databases.Connect()
+
 		res := db.Table("order").Where("Id=?",out_trade_no).First(&order).Scan(&order).Error
 		res2 := db.Table("user").Where("open_id=?",openid).First(&user).Scan(&user).Error
 
@@ -335,6 +340,7 @@ func Notify2(c *gin.Context) string{
 
 	rsp.ReturnCode = gopay.SUCCESS
 	rsp.ReturnMsg = "OK"
+	defer db.Close()
 	return rsp.ToXmlString()
 }
 
