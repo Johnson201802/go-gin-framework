@@ -27,7 +27,7 @@ func GetInit(c *gin.Context){
 	//    mchId：商户ID
 	//    apiKey：API秘钥值
 	//    isProd：是否是正式环境
-	client := wechat.NewClient("22", "22", "22", true)
+	client := wechat.NewClient("wxb5fb97bbf613fa55", "1604563089", "83748374873894tyeruigyfhdsefuyHU", true)
 
 	// 打开Debug开关，输出日志，默认关闭
 	client.DebugSwitch = gopay.DebugOn
@@ -82,7 +82,7 @@ func GetInit(c *gin.Context){
 
 	// 参数 sign ，可单独生成赋值到BodyMap中；也可不传sign参数，client内部会自动获取
 	// 如需单独赋值 sign 参数，需通过下面方法，最后获取sign值并在最后赋值此参数
-	sign := wechat.GetParamSign("22", "22", "22", bm)
+	sign := wechat.GetParamSign("wxb5fb97bbf613fa55", "1604563089", "83748374873894tyeruigyfhdsefuyHU", bm)
 	// sign, _ := wechat.GetSanBoxParamSign("wxdaa2ab9ef87b5497", mchId, apiKey, body)
 	bm.Set("sign", sign)
 
@@ -100,7 +100,7 @@ func GetInit(c *gin.Context){
 	//    signType：签名方式，务必与统一下单时用的签名方式一致
 	//    timeStamp：时间
 	//    apiKey：API秘钥值
-	paySign := wechat.GetMiniPaySign("22", wxRsp.NonceStr, packages, wechat.SignType_MD5, timeStamp, "22")
+	paySign := wechat.GetMiniPaySign("wxb5fb97bbf613fa55", wxRsp.NonceStr, packages, wechat.SignType_MD5, timeStamp, "83748374873894tyeruigyfhdsefuyHU")
 
 	fmt.Println(paySign)
 
@@ -125,7 +125,7 @@ func GetInit2(c *gin.Context){
 	//    mchId：商户ID
 	//    apiKey：API秘钥值
 	//    isProd：是否是正式环境
-	client := wechat.NewClient("22", "22", "22", true)
+	client := wechat.NewClient("wxb5fb97bbf613fa55", "1604563089", "83748374873894tyeruigyfhdsefuyHU", true)
 
 	// 打开Debug开关，输出日志，默认关闭
 	client.DebugSwitch = gopay.DebugOn
@@ -190,7 +190,7 @@ func GetInit2(c *gin.Context){
 
 	// 参数 sign ，可单独生成赋值到BodyMap中；也可不传sign参数，client内部会自动获取
 	// 如需单独赋值 sign 参数，需通过下面方法，最后获取sign值并在最后赋值此参数
-	sign := wechat.GetParamSign("22", "22", "22", bm)
+	sign := wechat.GetParamSign("wxb5fb97bbf613fa55", "1604563089", "83748374873894tyeruigyfhdsefuyHU", bm)
 	// sign, _ := wechat.GetSanBoxParamSign("wxdaa2ab9ef87b5497", mchId, apiKey, body)
 	bm.Set("sign", sign)
 
@@ -208,7 +208,7 @@ func GetInit2(c *gin.Context){
 	//    signType：签名方式，务必与统一下单时用的签名方式一致
 	//    timeStamp：时间
 	//    apiKey：API秘钥值
-	paySign := wechat.GetMiniPaySign("22", wxRsp.NonceStr, packages, wechat.SignType_MD5, timeStamp, "22")
+	paySign := wechat.GetMiniPaySign("wxb5fb97bbf613fa55", wxRsp.NonceStr, packages, wechat.SignType_MD5, timeStamp, "83748374873894tyeruigyfhdsefuyHU")
 
 	fmt.Println(paySign)
 
@@ -232,7 +232,7 @@ func Notify(c *gin.Context) string{
 	//    mchId：商户ID
 	//    apiKey：API秘钥值
 	//    isProd：是否是正式环境
-	client := wechat.NewClient("22", "22", "22", true)
+	client := wechat.NewClient("wxb5fb97bbf613fa55", "1604563089", "83748374873894tyeruigyfhdsefuyHU", true)
 
 	// 打开Debug开关，输出日志，默认关闭
 	client.DebugSwitch = gopay.DebugOn
@@ -293,7 +293,7 @@ func Notify2(c *gin.Context) string{
 	//    mchId：商户ID
 	//    apiKey：API秘钥值
 	//    isProd：是否是正式环境
-	client := wechat.NewClient("22", "22", "22", true)
+	client := wechat.NewClient("wxb5fb97bbf613fa55", "1604563089", "83748374873894tyeruigyfhdsefuyHU", true)
 
 	// 打开Debug开关，输出日志，默认关闭
 	client.DebugSwitch = gopay.DebugOn
@@ -315,7 +315,6 @@ func Notify2(c *gin.Context) string{
 	if err != nil {
 		xlog.Debug("err:", err)
 	}
-
 	db := databases.Connect()
 	xlog.Debug("bodyMap:", bodyMap)
 	out_trade_no := bodyMap.Get("out_trade_no")
@@ -325,7 +324,6 @@ func Notify2(c *gin.Context) string{
 	if err != nil {
 		xlog.Debug("err:", err)
 	}else{
-
 		res := db.Table("order").Where("Id=?",out_trade_no).First(&order).Scan(&order).Error
 		res2 := db.Table("user").Where("open_id=?",openid).First(&user).Scan(&user).Error
 
@@ -351,7 +349,7 @@ func Refund(c *gin.Context){
 	//    mchId：商户ID
 	//    apiKey：API秘钥值
 	//    isProd：是否是正式环境
-	client := wechat.NewClient("22", "22", "22", false)
+	client := wechat.NewClient("wxb5fb97bbf613fa55", "1604563089", "83748374873894tyeruigyfhdsefuyHU", false)
 
 	// 初始化参数结构体
 	bm := make(gopay.BodyMap)
@@ -370,7 +368,7 @@ func Refund(c *gin.Context){
 	//    certFilePath：cert证书路径
 	//    keyFilePath：Key证书路径
 	//    pkcs12FilePath：p12证书路径
-	wxRsp, resBm, err := client.Refund(bm, "iguiyu_cert/apiclient_cert.pem", "iguiyu_cert/apiclient_key.pem", "iguiyu_cert/apiclient_cert.p12")
+	wxRsp, resBm, err := client.Refund(bm, "./apiclient_cert.pem", "./apiclient_key.pem", "./apiclient_cert.p12")
 	if err != nil {
 		xlog.Error(err)
 		return

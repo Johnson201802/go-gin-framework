@@ -20,12 +20,29 @@ type Merchant struct{
 	Latitude string
 }
 
+type User4 struct{
+	User_id int
+	Is_vip string
+	Expire_vip_time int64
+}
+
 func GetMerchant2(c *gin.Context){
+	var user User4
 	var merchant[] Merchant
 
+	id, _ := strconv.Atoi(c.Request.FormValue("user_id"))
 	db := databases.Connect()
+	db.Table("user").Where("user_id=?",id).First(&user)
+	flag := 1
+	if user.Expire_vip_time < time.Now().Unix() {
+		user.Expire_vip_time = 0
+		user.Is_vip = ""
+		flag = 0
+		db.Table("user").Where("user_id=?",id).Updates(&user)
+	}
+
 	db.Table("merchant").Where("status=?","1").Find(&merchant)
-	c.JSON(200,gin.H{"data":merchant})
+	c.JSON(200,gin.H{"data":merchant,"flag":flag})
 	defer db.Close()
 }
 
@@ -49,6 +66,7 @@ func GetOpenid(c *gin.Context){
 	res , _ := wechat.WXLogin(code,"wxb5fb97bbf613fa55","392ff804414225de5f4c7b21ddf0afc6")
 	db := databases.Connect()
 	err := db.Table("user").Where("open_id = ?",res.OpenId).First(&user).Scan(&user).Error
+	defer db.Close()
 	if err != nil {
 		user.Avatar = avatar
 		user.Nick_name = nick_name
@@ -84,6 +102,7 @@ func GetPhoneNumber(c *gin.Context){
 	db := databases.Connect()
 	err := db.Table("user").Where("user_id=?",user_id).Update(&user).Error
 
+	defer db.Close()
 	if err == nil{
 		c.JSON(200,gin.H{
 			"code":200,
@@ -105,6 +124,7 @@ func GetAd(c *gin.Context){
 	var config Config
 	db := databases.Connect()
 	err := db.Table("config").Where("config_id=?",13).First(&config).Error
+	defer db.Close()
 	if err==nil{
 		c.JSON(200,gin.H{
 			"code":200,
@@ -149,6 +169,7 @@ func GetDetail(c *gin.Context){
 	db.Table("merchant").Where("merchant_id=?",id2).First(&merchant)
 
 	db.Table("order").Where("merchant_id=? AND status = ?",id2,1).Find(&order)
+	defer db.Close()
 	//db.Table("order").Where("merchant_id=? AND status = ?",id2,1).Count(&count)
 
 	//for key , _ :=range order{
@@ -189,6 +210,7 @@ func GetMerchantList(c *gin.Context){
 	db := databases.Connect()
 	db.Table("merchant").Where("status = ?","1").Limit(8).Offset(start).Find(&merchant).Scan(&merchant)
 
+	defer db.Close()
 	//for key,value := range merchant{
 	//	db.Table("order").Where("merchant_id=? AND status = ?",value.Merchant_id,1).Find(&order)
 	//	db.Table("order").Where("merchant_id=? AND status = ?",value.Merchant_id,1).Count(&merchant[key].Count)
@@ -226,6 +248,7 @@ func GetServiceList(c *gin.Context){
 	db := databases.Connect()
 	db.Table("service").Where("pid=?",pid2).Find(&service).Scan(&service)
 
+	defer db.Close()
 	c.JSON(200,gin.H{"code":200,"data":service})
 }
 
@@ -266,7 +289,7 @@ func GetOrderList(c *gin.Context){
 	start := (page-1)*6
 
 	db := databases.Connect()
-	db.Debug().Table("order").Select("order.Id, order.merchant_id, order.service_id, order.user_id, order.price, order.status, order.discount, merchant.name").Joins("join merchant on merchant.merchant_id = order.merchant_id").Where("order.user_id = ?",id).Offset(start).Limit(6).Find(&order).Scan(&order)
+	db.Table("order").Select("order.Id, order.merchant_id, order.service_id, order.user_id, order.price, order.status, order.discount, merchant.name").Joins("join merchant on merchant.merchant_id = order.merchant_id").Where("order.user_id = ?",id).Offset(start).Limit(6).Find(&order).Scan(&order)
 
 	for key , item := range order{
 		arr := strings.Split(item.Service_id,",")
@@ -278,6 +301,7 @@ func GetOrderList(c *gin.Context){
 		db.Debug().Table("service").Where("service_id in (?)",arr2).Find(&service).Scan(&service)
 		order[key].Services = service
 	}
+	defer db.Close()
 
 	c.JSON(200,gin.H{"code":200,"data":order})
 }
@@ -297,7 +321,7 @@ func GetCardList(c *gin.Context){
 
 	db := databases.Connect()
 	db.Table("card").Where("status = ?",1).Find(&card).Scan(&card)
-
+	defer db.Close()
 	c.JSON(200,gin.H{"code":200,"data":card})
 }
 
@@ -317,7 +341,7 @@ func GetVipInfo(c *gin.Context){
 	db.Table("user").Where("user_id = ?",id).First(&user).Scan(&user)
 
 	datetime := time.Unix(user.Expire_vip_time, 0).Format("2006-01-02")
-
+	defer db.Close()
 	c.JSON(200,gin.H{"code":200,"data":user,"datetime":datetime})
 }
 
@@ -366,6 +390,7 @@ func MakeOrder(c *gin.Context){
 	order.Time = time.Now().Unix()
 
 	db := databases.Connect()
+	defer db.Close()
 	if db.Table("order").Create(&order).Error == nil {
 		c.JSON(200,gin.H{
 			"code" : 200,
@@ -387,12 +412,9 @@ func MakeComment(c *gin.Context){
 	order.Conment = c.Request.FormValue("comment")
 	order.Stars ,_ = strconv.Atoi(c.Request.FormValue("count"))
 
-	fmt.Println(order.Id)
-	fmt.Println(order.Conment)
-	fmt.Println(order.Stars)
-
 	db := databases.Connect()
 	tt := db.Debug().Table("order").Where("Id=?",order.Id).Updates(&order).Error
+	defer db.Close()
 	if tt == nil{
 		c.JSON(200,gin.H{
 			"code" : 200,
@@ -402,4 +424,69 @@ func MakeComment(c *gin.Context){
 			"code" : 300,
 		})
 	}
+}
+
+func GetBind(c *gin.Context){
+	user_id ,_ := strconv.Atoi(c.Request.FormValue("user_id"))
+	id ,_ := strconv.Atoi(c.Request.FormValue("id"))
+
+	db := databases.Connect()
+	err := db.Table("user").Where("user_id=?",user_id).Update("merchant_id",id).Error
+
+	defer db.Close()
+	if err==nil {
+		c.JSON(200,gin.H{"code":200})
+	}else{
+		c.JSON(200,gin.H{"code":300})
+	}
+}
+
+//订单结构体
+type Order3 struct{
+	Id string
+	Merchant_id int
+	Service_id string
+	User_id int
+	Price float32
+	Discount int
+	Status int
+	Services [] Service3
+	Name string
+	Time int64
+	Time2 string
+}
+
+type Service3 struct{
+	Service_id int
+	Service_name string
+	Origin_price int
+}
+
+func GetMorderList(c *gin.Context){
+	var order[] Order3
+	var service[] Service3
+
+	id, _ := strconv.Atoi(c.Request.FormValue("mid"))
+	curPage := c.Request.FormValue("curPage")
+	page , _:= strconv.Atoi(curPage)
+	start := (page-1)*6
+
+	db := databases.Connect()
+	db.Debug().Table("order").Select("order.Id, order.merchant_id, order.service_id, order.user_id, order.price, order.status, order.discount, merchant.name, order.time").Joins("join merchant on merchant.merchant_id = order.merchant_id").Where("order.merchant_id = ?",id).Offset(start).Limit(6).Order("time desc").Find(&order).Scan(&order)
+
+	for key , item := range order{
+		arr := strings.Split(item.Service_id,",")
+		arr2 := []int{}
+		for _ , item2 := range arr{
+			tt , _:= strconv.Atoi(item2)
+			arr2 = append(arr2,tt)
+		}
+		db.Table("service").Where("service_id in (?)",arr2).Find(&service).Scan(&service)
+		order[key].Services = service
+		tt := time.Unix(order[key].Time, 0).Format("2006-01-02 15:04:05")
+		order[key].Time2 = tt
+	}
+	defer db.Close()
+
+	c.JSON(200,gin.H{"code":200,"data":order})
 }

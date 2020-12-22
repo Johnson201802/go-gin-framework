@@ -123,11 +123,13 @@ func InitRouter() *gin.Engine {
 	router.GET("/api/v1/getPayPreview2",v1.GetPayPreview2)
 	router.GET("/api/v1/makeOrder",v1.MakeOrder)
 	router.GET("/api/v1/getOrderList",v1.GetOrderList)
+	router.GET("/api/v1/getMorderList",v1.GetMorderList)
 	router.GET("/api/v1/getCardList",v1.GetCardList)
 	router.GET("/api/v1/getVipInfo",v1.GetVipInfo)
 	router.POST("/api/v1/notify",v1.Notify)
 	router.POST("/api/v1/notify2",v1.Notify2)
 	router.GET("/api/v1/makeComment",v1.MakeComment)
+	router.GET("/api/v1/getBind",v1.GetBind)
 
 	return router
 }
